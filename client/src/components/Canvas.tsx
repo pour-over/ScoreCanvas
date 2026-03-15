@@ -34,35 +34,34 @@ const getId = () => `node_${++nodeId}`;
 function autoLayout(nodes: Node[], edges: Edge[]): Node[] {
   if (nodes.length === 0) return nodes;
 
-  // Build adjacency
   const outgoing = new Map<string, string[]>();
   const incoming = new Map<string, string[]>();
   nodes.forEach((n) => { outgoing.set(n.id, []); incoming.set(n.id, []); });
   edges.forEach((e) => {
     outgoing.get(e.source)?.push(e.target);
-    incoming.get(e.source); // ensure exists
     incoming.get(e.target)?.push(e.source);
   });
 
-  // BFS from roots to assign depth (column)
+  // BFS from roots (no incoming edges)
   const depth = new Map<string, number>();
+  const visited = new Set<string>();
   const roots = nodes.filter((n) => (incoming.get(n.id)?.length ?? 0) === 0);
-  // If no roots (circular), just pick first node
   if (roots.length === 0) roots.push(nodes[0]);
 
   const queue: { id: string; d: number }[] = roots.map((r) => ({ id: r.id, d: 0 }));
   while (queue.length > 0) {
     const { id, d } = queue.shift()!;
-    if (depth.has(id) && depth.get(id)! >= d) continue;
+    if (visited.has(id)) continue;
+    visited.add(id);
     depth.set(id, d);
     for (const tgt of outgoing.get(id) ?? []) {
-      if (!depth.has(tgt) || depth.get(tgt)! < d + 1) {
+      if (!visited.has(tgt)) {
         queue.push({ id: tgt, d: d + 1 });
       }
     }
   }
 
-  // Assign unvisited nodes (disconnected) to column 0
+  // Disconnected nodes go to column 0
   nodes.forEach((n) => { if (!depth.has(n.id)) depth.set(n.id, 0); });
 
   // Group by column
@@ -75,26 +74,20 @@ function autoLayout(nodes: Node[], edges: Edge[]): Node[] {
 
   const COL_WIDTH = 340;
   const ROW_HEIGHT = 220;
-  const PAD_X = 80;
-  const PAD_Y = 80;
 
-  const positioned = nodes.map((n) => {
+  return nodes.map((n) => {
     const col = depth.get(n.id) ?? 0;
     const colNodes = columns.get(col) ?? [n];
     const row = colNodes.indexOf(n);
-    const totalRows = colNodes.length;
-    // Center vertically
-    const yOffset = -(totalRows - 1) * ROW_HEIGHT / 2;
+    const yOffset = -(colNodes.length - 1) * ROW_HEIGHT / 2;
     return {
       ...n,
       position: {
-        x: PAD_X + col * COL_WIDTH,
-        y: PAD_Y + 400 + yOffset + row * ROW_HEIGHT,
+        x: 80 + col * COL_WIDTH,
+        y: 480 + yOffset + row * ROW_HEIGHT,
       },
     };
   });
-
-  return positioned;
 }
 
 interface CanvasProps {
