@@ -1,6 +1,7 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 
 interface StingerData {
+  [key: string]: unknown;
   label: string;
   trigger: string;
   asset: string;

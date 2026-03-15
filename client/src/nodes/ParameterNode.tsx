@@ -1,6 +1,7 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 
 interface ParameterData {
+  [key: string]: unknown;
   label: string;
   paramName: string;
   minValue: number;

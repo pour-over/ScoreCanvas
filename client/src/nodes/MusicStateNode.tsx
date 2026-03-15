@@ -1,6 +1,7 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 
 interface MusicStateData {
+  [key: string]: unknown;
   label: string;
   intensity: number;
   looping: boolean;

@@ -5,7 +5,13 @@
       "Bash(npm install:*)",
       "mcp__Claude_Preview__preview_start",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(gh repo:*)",
+      "Bash(git push:*)",
+      "Bash(npx -y @netlify/mcp@latest --proxy-path \"https://netlify-mcp.netlify.app/proxy/eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..tXO79IlBlymlLhqo.Lvamac9hZVd3cgpZGYWeo46nPEMDYvjTbTmy6zxb3AkMhu3LurtYggVYIxRhxGHNday_xuaenIc00NdT8vr1as86pZUwNoWzb-VQQnpPUQ7NSsbGZTm4cqm63cMPyQyfM8kZaPn_YpDBG7QHHo7jzI7KP2OzAFAkR-XXUb1c2qeg7mVzhxTdvebT4IeROcfe6mAvvaBjqp8e0rcZYyjDjnQLCJ_a1Nm6ed2PcakK_QF0ENoMCvI4VREPrEyYtNSwRqeHRHTirWXQVg.RIdOJ_MYHZGUkzst6FvV8Q\")",
+      "Bash(npx -y netlify-cli --version)",
+      "Bash(npm run:*)"
     ]
   }
 }

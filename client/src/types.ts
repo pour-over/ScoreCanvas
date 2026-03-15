@@ -1,4 +1,5 @@
 export interface MusicStateData {
+  [key: string]: unknown;
   label: string;
   intensity: number; // 0-100
   looping: boolean;
@@ -6,6 +7,7 @@ export interface MusicStateData {
 }
 
 export interface TransitionData {
+  [key: string]: unknown;
   label: string;
   duration: number; // ms
   syncPoint: "immediate" | "next-bar" | "next-beat" | "custom";
