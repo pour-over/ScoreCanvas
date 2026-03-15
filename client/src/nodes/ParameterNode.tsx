@@ -1,4 +1,5 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
+import { useViewMode } from "../context/ViewModeContext";
 
 interface ParameterData {
   [key: string]: unknown;
@@ -14,29 +15,38 @@ interface ParameterData {
 type ParameterNode = Node<ParameterData, "parameter">;
 
 export function ParameterNode({ data }: NodeProps<ParameterNode>) {
+  const { mode } = useViewMode();
+  const simple = mode === "simple";
   const pct = ((data.defaultValue - data.minValue) / (data.maxValue - data.minValue)) * 100;
+
   return (
-    <div className="bg-[#1a1a3e] border-2 border-[#a855f7] rounded-lg px-4 py-3 min-w-[180px] shadow-lg shadow-purple-900/20">
+    <div className={`bg-[#1a1a3e] border-2 border-[#a855f7] rounded-lg shadow-lg shadow-purple-900/20 ${simple ? "px-3 py-2 min-w-[120px]" : "px-4 py-3 min-w-[180px]"}`}>
       <Handle type="target" position={Position.Left} className="!bg-[#a855f7] !w-3 !h-3" />
       <div className="flex items-center gap-1.5 mb-1">
-        <svg width="10" height="10" viewBox="0 0 10 10" className="text-[#a855f7]"><circle cx="5" cy="5" r="4" fill="none" stroke="currentColor" strokeWidth="1.5"/><circle cx="5" cy="5" r="2" fill="currentColor"/></svg>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-[#a855f7]" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
+        </svg>
         <span className="text-xs font-mono text-[#a855f7] uppercase tracking-wider">RTPC</span>
       </div>
       <div className="text-sm font-semibold text-canvas-text">{data.label}</div>
-      <div className="text-[10px] font-mono text-canvas-muted mt-0.5">{data.paramName}</div>
-      <div className="mt-2 flex items-center gap-2 text-[10px] text-canvas-muted">
-        <span>{data.minValue}</span>
-        <div className="flex-1 h-1.5 bg-canvas-bg rounded-full overflow-hidden">
-          <div className="h-full bg-[#a855f7] rounded-full" style={{ width: `${pct}%` }} />
-        </div>
-        <span>{data.maxValue}</span>
-      </div>
-      <div className="mt-1.5 text-[10px] text-canvas-muted leading-tight">{data.description}</div>
-      {data.directorNote && (
-        <div className="mt-2 border-t border-canvas-accent/50 pt-1.5">
-          <div className="text-[9px] font-mono text-amber-400/70 uppercase tracking-wider mb-0.5">Director Note</div>
-          <div className="text-[10px] text-amber-200/80 leading-tight italic">{data.directorNote}</div>
-        </div>
+      {!simple && (
+        <>
+          <div className="text-[10px] font-mono text-canvas-muted mt-0.5">{data.paramName}</div>
+          <div className="mt-2 flex items-center gap-2 text-[10px] text-canvas-muted">
+            <span>{data.minValue}</span>
+            <div className="flex-1 h-1.5 bg-canvas-bg rounded-full overflow-hidden">
+              <div className="h-full bg-[#a855f7] rounded-full" style={{ width: `${pct}%` }} />
+            </div>
+            <span>{data.maxValue}</span>
+          </div>
+          <div className="mt-1.5 text-[10px] text-canvas-muted leading-tight">{data.description}</div>
+          {data.directorNote && (
+            <div className="mt-2 border-t border-canvas-accent/50 pt-1.5">
+              <div className="text-[9px] font-mono text-amber-400/70 uppercase tracking-wider mb-0.5">Director Note</div>
+              <div className="text-[10px] text-amber-200/80 leading-tight italic">{data.directorNote}</div>
+            </div>
+          )}
+        </>
       )}
       <Handle type="source" position={Position.Right} className="!bg-[#a855f7] !w-3 !h-3" />
     </div>

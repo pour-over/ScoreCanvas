@@ -5,6 +5,7 @@ import { Sidebar } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
 import { ProjectAssets } from "./components/ProjectAssets";
 import { ExportModal } from "./components/ExportModal";
+import { ViewModeProvider } from "./context/ViewModeContext";
 import { levels } from "./data/levels";
 import "./App.css";
 
@@ -33,9 +34,11 @@ export default function App() {
           onSelectLevel={setSelectedLevelId}
           currentLevel={currentLevel}
         />
-        <ReactFlowProvider>
-          <Canvas level={currentLevel} />
-        </ReactFlowProvider>
+        <ViewModeProvider>
+          <ReactFlowProvider>
+            <Canvas level={currentLevel} />
+          </ReactFlowProvider>
+        </ViewModeProvider>
       </div>
       {showProjectAssets && (
         <ProjectAssets levels={levels} onClose={() => setShowProjectAssets(false)} />

@@ -1,4 +1,5 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
+import { useViewMode } from "../context/ViewModeContext";
 
 interface StingerData {
   [key: string]: unknown;
@@ -19,28 +20,37 @@ const priorityColors: Record<string, string> = {
 };
 
 export function StingerNode({ data }: NodeProps<StingerNode>) {
+  const { mode } = useViewMode();
+  const simple = mode === "simple";
   const color = priorityColors[data.priority] ?? "#6b7280";
+
   return (
-    <div className="bg-[#2a1a1e] border-2 rounded-lg px-4 py-3 min-w-[160px] shadow-lg" style={{ borderColor: color }}>
+    <div className={`bg-[#2a1a1e] border-2 rounded-lg shadow-lg ${simple ? "px-3 py-2 min-w-[120px]" : "px-4 py-3 min-w-[160px]"}`} style={{ borderColor: color }}>
       <Handle type="target" position={Position.Left} className="!w-3 !h-3" style={{ background: color }} />
       <div className="flex items-center gap-1.5 mb-1">
-        <svg width="10" height="10" viewBox="0 0 10 10" style={{ color }}><polygon points="5,0 10,10 0,10" fill="currentColor"/></svg>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color }}>
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+        </svg>
         <span className="text-xs font-mono uppercase tracking-wider" style={{ color }}>Stinger</span>
       </div>
       <div className="text-sm font-semibold text-canvas-text">{data.label}</div>
-      <div className="mt-1.5 grid grid-cols-[auto_1fr] gap-x-2 gap-y-0.5 text-[10px]">
-        <span className="text-canvas-muted">Trigger:</span>
-        <span className="text-canvas-text font-mono">{data.trigger}</span>
-        <span className="text-canvas-muted">Asset:</span>
-        <span className="text-canvas-text font-mono truncate">{data.asset}</span>
-        <span className="text-canvas-muted">Priority:</span>
-        <span className="font-mono font-bold uppercase" style={{ color }}>{data.priority}</span>
-      </div>
-      {data.directorNote && (
-        <div className="mt-2 border-t border-canvas-accent/50 pt-1.5">
-          <div className="text-[9px] font-mono text-amber-400/70 uppercase tracking-wider mb-0.5">Director Note</div>
-          <div className="text-[10px] text-amber-200/80 leading-tight italic">{data.directorNote}</div>
-        </div>
+      {!simple && (
+        <>
+          <div className="mt-1.5 grid grid-cols-[auto_1fr] gap-x-2 gap-y-0.5 text-[10px]">
+            <span className="text-canvas-muted">Trigger:</span>
+            <span className="text-canvas-text font-mono">{data.trigger}</span>
+            <span className="text-canvas-muted">Asset:</span>
+            <span className="text-canvas-text font-mono truncate">{data.asset}</span>
+            <span className="text-canvas-muted">Priority:</span>
+            <span className="font-mono font-bold uppercase" style={{ color }}>{data.priority}</span>
+          </div>
+          {data.directorNote && (
+            <div className="mt-2 border-t border-canvas-accent/50 pt-1.5">
+              <div className="text-[9px] font-mono text-amber-400/70 uppercase tracking-wider mb-0.5">Director Note</div>
+              <div className="text-[10px] text-amber-200/80 leading-tight italic">{data.directorNote}</div>
+            </div>
+          )}
+        </>
       )}
       <Handle type="source" position={Position.Right} className="!w-3 !h-3" style={{ background: color }} />
     </div>
