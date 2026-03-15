@@ -8,6 +8,7 @@ const nodeTemplates = [
   { type: "transition", label: "Transition", description: "Rule for moving between states" },
   { type: "parameter", label: "Parameter", description: "RTPC / game-driven value" },
   { type: "stinger", label: "Stinger", description: "One-shot triggered event" },
+  { type: "event", label: "Game Event", description: "Cinematic, IGC, Button Press…" },
 ];
 
 interface SidebarProps {

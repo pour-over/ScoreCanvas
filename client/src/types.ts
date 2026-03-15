@@ -12,4 +12,5 @@ export interface TransitionData {
   duration: number; // ms
   syncPoint: "immediate" | "next-bar" | "next-beat" | "custom";
   fadeType: "crossfade" | "sting" | "cut" | "bridge";
+  directorNote?: string;
 }

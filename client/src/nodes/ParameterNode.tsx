@@ -8,6 +8,7 @@ interface ParameterData {
   maxValue: number;
   defaultValue: number;
   description: string;
+  directorNote?: string;
 }
 
 type ParameterNode = Node<ParameterData, "parameter">;
@@ -31,6 +32,12 @@ export function ParameterNode({ data }: NodeProps<ParameterNode>) {
         <span>{data.maxValue}</span>
       </div>
       <div className="mt-1.5 text-[10px] text-canvas-muted leading-tight">{data.description}</div>
+      {data.directorNote && (
+        <div className="mt-2 border-t border-canvas-accent/50 pt-1.5">
+          <div className="text-[9px] font-mono text-amber-400/70 uppercase tracking-wider mb-0.5">Director Note</div>
+          <div className="text-[10px] text-amber-200/80 leading-tight italic">{data.directorNote}</div>
+        </div>
+      )}
       <Handle type="source" position={Position.Right} className="!bg-[#a855f7] !w-3 !h-3" />
     </div>
   );

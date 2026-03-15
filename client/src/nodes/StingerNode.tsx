@@ -6,6 +6,7 @@ interface StingerData {
   trigger: string;
   asset: string;
   priority: "low" | "medium" | "high" | "critical";
+  directorNote?: string;
 }
 
 type StingerNode = Node<StingerData, "stinger">;
@@ -35,6 +36,12 @@ export function StingerNode({ data }: NodeProps<StingerNode>) {
         <span className="text-canvas-muted">Priority:</span>
         <span className="font-mono font-bold uppercase" style={{ color }}>{data.priority}</span>
       </div>
+      {data.directorNote && (
+        <div className="mt-2 border-t border-canvas-accent/50 pt-1.5">
+          <div className="text-[9px] font-mono text-amber-400/70 uppercase tracking-wider mb-0.5">Director Note</div>
+          <div className="text-[10px] text-amber-200/80 leading-tight italic">{data.directorNote}</div>
+        </div>
+      )}
       <Handle type="source" position={Position.Right} className="!w-3 !h-3" style={{ background: color }} />
     </div>
   );

@@ -7,6 +7,7 @@ interface MusicStateData {
   looping: boolean;
   stems: string[];
   asset?: string;
+  directorNote?: string;
 }
 
 type MusicStateNode = Node<MusicStateData, "musicState">;
@@ -54,6 +55,12 @@ export function MusicStateNode({ data }: NodeProps<MusicStateNode>) {
           <span className="text-[10px] text-[#4ecdc4] font-mono font-bold">ONE-SHOT</span>
         )}
       </div>
+      {data.directorNote && (
+        <div className="mt-2 border-t border-canvas-accent/50 pt-1.5">
+          <div className="text-[9px] font-mono text-amber-400/70 uppercase tracking-wider mb-0.5">Director Note</div>
+          <div className="text-[10px] text-amber-200/80 leading-tight italic">{data.directorNote}</div>
+        </div>
+      )}
       <Handle type="source" position={Position.Right} className="!bg-canvas-highlight !w-3 !h-3" />
     </div>
   );

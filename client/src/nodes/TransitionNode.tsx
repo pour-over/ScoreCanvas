@@ -19,6 +19,12 @@ export function TransitionNode({ data }: NodeProps<TransitionNode>) {
         <span>Duration:</span>
         <span className="text-canvas-text">{data.duration}ms</span>
       </div>
+      {data.directorNote && (
+        <div className="mt-2 border-t border-canvas-accent/50 pt-1.5">
+          <div className="text-[9px] font-mono text-amber-400/70 uppercase tracking-wider mb-0.5">Director Note</div>
+          <div className="text-[10px] text-amber-200/80 leading-tight italic">{data.directorNote}</div>
+        </div>
+      )}
       <Handle type="source" position={Position.Right} className="!bg-canvas-text !w-2.5 !h-2.5" />
     </div>
   );
