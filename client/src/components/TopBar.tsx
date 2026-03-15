@@ -7,6 +7,7 @@ interface TopBarProps {
   assetCount: number;
   onOpenProjectAssets: () => void;
   onOpenExport: () => void;
+  onOpenStatusReport: () => void;
 }
 
 const integrations = [
@@ -25,6 +26,7 @@ export function TopBar({
   assetCount,
   onOpenProjectAssets,
   onOpenExport,
+  onOpenStatusReport,
 }: TopBarProps) {
   return (
     <header className="h-11 bg-[#0d0d1a] border-b border-canvas-accent flex items-center px-4 gap-4 shrink-0">
@@ -53,7 +55,13 @@ export function TopBar({
           onClick={onOpenExport}
           className="px-2.5 py-1 text-[11px] font-semibold rounded bg-canvas-highlight/80 text-white border border-canvas-highlight hover:bg-canvas-highlight transition-colors"
         >
-          Export Template
+          Export Schema
+        </button>
+        <button
+          onClick={onOpenStatusReport}
+          className="px-2.5 py-1 text-[11px] font-semibold rounded bg-emerald-600/80 text-white border border-emerald-500 hover:bg-emerald-600 transition-colors"
+        >
+          Status Report
         </button>
       </div>
       <div className="flex-1" />

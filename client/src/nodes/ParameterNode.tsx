@@ -1,5 +1,6 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import { useViewMode } from "../context/ViewModeContext";
+import { StatusBadge } from "../components/StatusBadge";
 
 interface ParameterData {
   [key: string]: unknown;
@@ -10,6 +11,8 @@ interface ParameterData {
   defaultValue: number;
   description: string;
   directorNote?: string;
+  status?: string;
+  jiraTicket?: string;
 }
 
 type ParameterNode = Node<ParameterData, "parameter">;
@@ -46,8 +49,10 @@ export function ParameterNode({ data }: NodeProps<ParameterNode>) {
               <div className="text-[10px] text-amber-200/80 leading-tight italic">{data.directorNote}</div>
             </div>
           )}
+          <StatusBadge status={data.status} jiraTicket={data.jiraTicket} />
         </>
       )}
+      {simple && (data.status || data.jiraTicket) && <StatusBadge status={data.status} jiraTicket={data.jiraTicket} />}
       <Handle type="source" position={Position.Right} className="!bg-[#a855f7] !w-3 !h-3" />
     </div>
   );

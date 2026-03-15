@@ -5,6 +5,7 @@ import { Sidebar } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
 import { ProjectAssets } from "./components/ProjectAssets";
 import { ExportModal } from "./components/ExportModal";
+import { StatusReport } from "./components/StatusReport";
 import { ViewModeProvider } from "./context/ViewModeContext";
 import { levels } from "./data/levels";
 import "./App.css";
@@ -13,6 +14,7 @@ export default function App() {
   const [selectedLevelId, setSelectedLevelId] = useState(levels[0].id);
   const [showProjectAssets, setShowProjectAssets] = useState(false);
   const [showExport, setShowExport] = useState(false);
+  const [showStatusReport, setShowStatusReport] = useState(false);
   const currentLevel = levels.find((l) => l.id === selectedLevelId) ?? levels[0];
 
   return (
@@ -26,6 +28,7 @@ export default function App() {
         assetCount={currentLevel.assets.length}
         onOpenProjectAssets={() => setShowProjectAssets(true)}
         onOpenExport={() => setShowExport(true)}
+        onOpenStatusReport={() => setShowStatusReport(true)}
       />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar
@@ -45,6 +48,9 @@ export default function App() {
       )}
       {showExport && (
         <ExportModal level={currentLevel} onClose={() => setShowExport(false)} />
+      )}
+      {showStatusReport && (
+        <StatusReport levels={levels} onClose={() => setShowStatusReport(false)} />
       )}
     </div>
   );

@@ -13,4 +13,6 @@ export interface TransitionData {
   syncPoint: "immediate" | "next-bar" | "next-beat" | "custom";
   fadeType: "crossfade" | "sting" | "cut" | "bridge";
   directorNote?: string;
+  status?: string;
+  jiraTicket?: string;
 }

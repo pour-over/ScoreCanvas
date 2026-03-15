@@ -1,5 +1,6 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import { useViewMode } from "../context/ViewModeContext";
+import { StatusBadge } from "../components/StatusBadge";
 
 interface EventData {
   [key: string]: unknown;
@@ -8,6 +9,8 @@ interface EventData {
   blueprintRef: string;
   description: string;
   directorNote?: string;
+  status?: string;
+  jiraTicket?: string;
 }
 
 type EventNode = Node<EventData, "event">;
@@ -50,8 +53,10 @@ export function EventNode({ data }: NodeProps<EventNode>) {
               <div className="text-[10px] text-amber-200/80 leading-tight italic">{data.directorNote}</div>
             </div>
           )}
+          <StatusBadge status={data.status} jiraTicket={data.jiraTicket} />
         </>
       )}
+      {simple && (data.status || data.jiraTicket) && <StatusBadge status={data.status} jiraTicket={data.jiraTicket} />}
       <Handle type="source" position={Position.Right} className="!w-3 !h-3" style={{ background: config.color }} />
     </div>
   );

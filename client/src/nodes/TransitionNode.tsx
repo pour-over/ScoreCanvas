@@ -1,5 +1,6 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import { useViewMode } from "../context/ViewModeContext";
+import { StatusBadge } from "../components/StatusBadge";
 import type { TransitionData } from "../types";
 
 type TransitionNode = Node<TransitionData, "transition">;
@@ -34,8 +35,10 @@ export function TransitionNode({ data }: NodeProps<TransitionNode>) {
               <div className="text-[10px] text-amber-200/80 leading-tight italic">{data.directorNote}</div>
             </div>
           )}
+          <StatusBadge status={data.status} jiraTicket={data.jiraTicket} />
         </>
       )}
+      {simple && (data.status || data.jiraTicket) && <StatusBadge status={data.status} jiraTicket={data.jiraTicket} />}
       <Handle type="source" position={Position.Right} className="!bg-canvas-text !w-2.5 !h-2.5" />
     </div>
   );
