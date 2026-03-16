@@ -1,5 +1,6 @@
-import { useCallback, useRef, useEffect, type DragEvent } from "react";
+import { useCallback, useRef, useEffect, useState, type DragEvent } from "react";
 import { useViewMode } from "../context/ViewModeContext";
+import { auditionAsset, stopAudition, type AssetCategory } from "../audio/synth";
 import {
   ReactFlow,
   Background,
@@ -156,6 +157,98 @@ export function Canvas({ level }: CanvasProps) {
     setTimeout(() => fitView({ padding: 0.2, duration: 400 }), 50);
   }, [setNodes, edges, fitView]);
 
+  // ─── Play Sequence: walk graph and audition each node ──────────────────────
+  const [sequencePlaying, setSequencePlaying] = useState(false);
+  const [sequenceNodeId, setSequenceNodeId] = useState<string | null>(null);
+  const sequenceAbort = useRef(false);
+
+  const handlePlaySequence = useCallback(() => {
+    if (sequencePlaying) {
+      sequenceAbort.current = true;
+      stopAudition();
+      setSequencePlaying(false);
+      setSequenceNodeId(null);
+      return;
+    }
+
+    // Build adjacency from edges
+    const outgoing = new Map<string, string[]>();
+    nodes.forEach((n) => outgoing.set(n.id, []));
+    edges.forEach((e) => {
+      if (outgoing.has(e.source)) outgoing.get(e.source)!.push(e.target);
+    });
+    const incomingCount = new Map<string, number>();
+    nodes.forEach((n) => incomingCount.set(n.id, 0));
+    edges.forEach((e) => incomingCount.set(e.target, (incomingCount.get(e.target) ?? 0) + 1));
+
+    // BFS order — roots first, then follow edges
+    const visited = new Set<string>();
+    const order: Node[] = [];
+    const roots = nodes.filter((n) => (incomingCount.get(n.id) ?? 0) === 0);
+    if (roots.length === 0 && nodes.length > 0) roots.push(nodes[0]);
+
+    const queue = [...roots];
+    while (queue.length > 0) {
+      const n = queue.shift()!;
+      if (visited.has(n.id)) continue;
+      visited.add(n.id);
+      order.push(n);
+      for (const targetId of outgoing.get(n.id) ?? []) {
+        const target = nodes.find((nn) => nn.id === targetId);
+        if (target && !visited.has(target.id)) queue.push(target);
+      }
+    }
+    // Add any disconnected nodes
+    nodes.forEach((n) => { if (!visited.has(n.id)) order.push(n); });
+
+    // Map node type → synth category + duration
+    function nodeToAudition(n: Node): { category: AssetCategory; durationMs: number } {
+      const d = n.data as Record<string, unknown>;
+      switch (n.type) {
+        case "musicState": {
+          const looping = d.looping as boolean;
+          return looping
+            ? { category: "loop", durationMs: 3500 }
+            : { category: "intro", durationMs: 2500 };
+        }
+        case "transition":
+          return { category: "transition", durationMs: 1800 };
+        case "stinger":
+          return { category: "stinger", durationMs: 1200 };
+        case "parameter":
+          return { category: "ambient", durationMs: 2500 };
+        case "event": {
+          const et = d.eventType as string;
+          return et === "cinematic" || et === "igc"
+            ? { category: "intro", durationMs: 2500 }
+            : { category: "stinger", durationMs: 1200 };
+        }
+        default:
+          return { category: "loop", durationMs: 2000 };
+      }
+    }
+
+    sequenceAbort.current = false;
+    setSequencePlaying(true);
+
+    // Play nodes one at a time
+    let i = 0;
+    function playNext() {
+      if (sequenceAbort.current || i >= order.length) {
+        setSequencePlaying(false);
+        setSequenceNodeId(null);
+        return;
+      }
+      const n = order[i];
+      const { category, durationMs } = nodeToAudition(n);
+      setSequenceNodeId(n.id);
+      auditionAsset({ id: n.id, category, key: "Dm", bpm: 120 });
+      i++;
+      setTimeout(playNext, durationMs + 300); // 300ms gap between nodes
+    }
+    playNext();
+  }, [sequencePlaying, nodes, edges]);
+
   return (
     <div ref={reactFlowWrapper} className="flex-1 h-full">
       <ReactFlow
@@ -177,6 +270,26 @@ export function Canvas({ level }: CanvasProps) {
         <Panel position="top-right">
           <div className="flex gap-2">
             <button
+              onClick={handlePlaySequence}
+              className={`px-3 py-1.5 text-[11px] font-semibold rounded-lg border transition-colors backdrop-blur-sm shadow-lg flex items-center gap-1.5 ${
+                sequencePlaying
+                  ? "bg-red-500/20 text-red-400 border-red-500/50 hover:bg-red-500/30 animate-pulse"
+                  : "bg-green-900/30 text-green-400 border-green-500/40 hover:bg-green-500/20 hover:border-green-400/60"
+              }`}
+            >
+              {sequencePlaying ? (
+                <>
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><rect x="1" y="1" width="8" height="8" rx="1" /></svg>
+                  Stop Sequence
+                </>
+              ) : (
+                <>
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><polygon points="1,0 10,5 1,10" /></svg>
+                  Play Sequence
+                </>
+              )}
+            </button>
+            <button
               onClick={toggleViewMode}
               className={`px-3 py-1.5 text-[11px] font-semibold rounded-lg border transition-colors backdrop-blur-sm shadow-lg ${
                 mode === "simple"
@@ -193,6 +306,13 @@ export function Canvas({ level }: CanvasProps) {
               Clean Up View
             </button>
           </div>
+          {sequenceNodeId && (
+            <div className="mt-2 text-right">
+              <span className="px-2 py-1 text-[10px] font-mono bg-green-900/40 text-green-300 border border-green-500/30 rounded-md backdrop-blur-sm">
+                Now playing: {nodes.find((n) => n.id === sequenceNodeId)?.data?.label as string ?? sequenceNodeId}
+              </span>
+            </div>
+          )}
         </Panel>
         <MiniMap
           nodeColor={(n) => {
