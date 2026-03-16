@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { GameLevel } from "../data/levels";
+import type { GameLevel } from "../data/projects";
 import type { Edge } from "@xyflow/react";
 
 interface ExportModalProps {

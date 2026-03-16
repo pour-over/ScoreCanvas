@@ -1,4 +1,4 @@
-import type { GameLevel } from "../data/levels";
+import type { GameLevel } from "../data/projects";
 
 const statusLabels: Record<string, { label: string; color: string; order: number }> = {
   blocked:        { label: "Blocked",        color: "bg-red-500",     order: 0 },

@@ -1,4 +1,4 @@
-import type { GameLevel } from "../data/levels";
+import type { GameLevel } from "../data/projects";
 
 interface LevelBrowserProps {
   levels: GameLevel[];

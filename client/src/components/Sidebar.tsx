@@ -1,5 +1,5 @@
 import type { DragEvent } from "react";
-import type { GameLevel } from "../data/levels";
+import type { GameLevel, GameProject } from "../data/projects";
 import { LevelBrowser } from "./LevelBrowser";
 import { AssetBrowser } from "./AssetBrowser";
 
@@ -12,13 +12,16 @@ const nodeTemplates = [
 ];
 
 interface SidebarProps {
+  projects: GameProject[];
+  selectedProjectId: string;
+  onSelectProject: (id: string) => void;
   levels: GameLevel[];
   selectedLevelId: string;
   onSelectLevel: (id: string) => void;
   currentLevel: GameLevel;
 }
 
-export function Sidebar({ levels, selectedLevelId, onSelectLevel, currentLevel }: SidebarProps) {
+export function Sidebar({ projects, selectedProjectId, onSelectProject, levels, selectedLevelId, onSelectLevel, currentLevel }: SidebarProps) {
   const onDragStart = (event: DragEvent, nodeType: string) => {
     event.dataTransfer.setData("application/scorecanvas-node", nodeType);
     event.dataTransfer.effectAllowed = "move";
@@ -26,8 +29,30 @@ export function Sidebar({ levels, selectedLevelId, onSelectLevel, currentLevel }
 
   return (
     <aside className="w-60 bg-[#0d0d1a] border-r border-canvas-accent flex flex-col shrink-0 overflow-hidden">
+      {/* Project Switcher */}
+      <div className="px-2 pt-2 pb-1">
+        <div className="flex gap-1 bg-canvas-bg rounded-lg p-0.5">
+          {projects.map((proj) => (
+            <button
+              key={proj.id}
+              onClick={() => onSelectProject(proj.id)}
+              className={`flex-1 px-1.5 py-1 text-[9px] font-bold uppercase tracking-wider rounded-md transition-all truncate ${
+                selectedProjectId === proj.id
+                  ? "bg-canvas-highlight/20 text-canvas-highlight border border-canvas-highlight/40 shadow-sm"
+                  : "text-canvas-muted hover:text-canvas-text hover:bg-canvas-accent/30 border border-transparent"
+              }`}
+              title={proj.name}
+            >
+              {proj.id === "journey-2" ? "Journey 2" : "Bloodborne 2"}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mx-3 border-t border-canvas-accent" />
+
       {/* Level Browser */}
-      <div className="px-3 pt-3 pb-2 overflow-y-auto max-h-[280px]">
+      <div className="px-3 pt-2 pb-2 overflow-y-auto max-h-[260px]">
         <LevelBrowser levels={levels} selectedId={selectedLevelId} onSelect={onSelectLevel} />
       </div>
 

@@ -1,9 +1,10 @@
 import { useState, type DragEvent } from "react";
-import type { GameLevel, MusicAsset } from "../data/levels";
+import type { GameLevel, MusicAsset } from "../data/projects";
 import { auditionAsset, stopAudition, type AssetCategory } from "../audio/synth";
 
 interface ProjectAssetsProps {
   levels: GameLevel[];
+  projectName: string;
   onClose: () => void;
 }
 
@@ -11,7 +12,7 @@ const categoryColors: Record<string, string> = {
   intro: "#4ecdc4", loop: "#e94560", ending: "#f59e0b", transition: "#818cf8", stinger: "#f97316", layer: "#a855f7", ambient: "#a855f7",
 };
 
-export function ProjectAssets({ levels, onClose }: ProjectAssetsProps) {
+export function ProjectAssets({ levels, projectName, onClose }: ProjectAssetsProps) {
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [filter, setFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
@@ -55,7 +56,7 @@ export function ProjectAssets({ levels, onClose }: ProjectAssetsProps) {
         <div className="flex items-center justify-between px-5 py-3 border-b border-canvas-accent">
           <div>
             <h2 className="text-sm font-bold text-canvas-text">Project Music Assets</h2>
-            <p className="text-[10px] text-canvas-muted font-mono mt-0.5">JOURNEY 2: THE RECKONING — {allAssets.length} total assets across {levels.length} levels</p>
+            <p className="text-[10px] text-canvas-muted font-mono mt-0.5">{projectName} — {allAssets.length} total assets across {levels.length} levels</p>
           </div>
           <div className="flex items-center gap-3">
             {playingId && (

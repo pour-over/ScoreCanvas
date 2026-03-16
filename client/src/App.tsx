@@ -7,20 +7,30 @@ import { ProjectAssets } from "./components/ProjectAssets";
 import { ExportModal } from "./components/ExportModal";
 import { StatusReport } from "./components/StatusReport";
 import { ViewModeProvider } from "./context/ViewModeContext";
-import { levels } from "./data/levels";
+import { projects } from "./data/projects";
 import "./App.css";
 
 export default function App() {
-  const [selectedLevelId, setSelectedLevelId] = useState(levels[0].id);
+  const [selectedProjectId, setSelectedProjectId] = useState(projects[0].id);
+  const currentProject = projects.find((p) => p.id === selectedProjectId) ?? projects[0];
+
+  const [selectedLevelId, setSelectedLevelId] = useState(currentProject.levels[0].id);
+  const currentLevel = currentProject.levels.find((l) => l.id === selectedLevelId) ?? currentProject.levels[0];
+
   const [showProjectAssets, setShowProjectAssets] = useState(false);
   const [showExport, setShowExport] = useState(false);
   const [showStatusReport, setShowStatusReport] = useState(false);
-  const currentLevel = levels.find((l) => l.id === selectedLevelId) ?? levels[0];
+
+  const handleSelectProject = (projectId: string) => {
+    setSelectedProjectId(projectId);
+    const proj = projects.find((p) => p.id === projectId) ?? projects[0];
+    setSelectedLevelId(proj.levels[0].id);
+  };
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-canvas-bg">
       <TopBar
-        projectName="JOURNEY 2: THE RECKONING"
+        projectName={currentProject.name}
         levelName={currentLevel.name}
         levelSubtitle={currentLevel.subtitle}
         nodeCount={currentLevel.nodes.length}
@@ -32,7 +42,10 @@ export default function App() {
       />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar
-          levels={levels}
+          projects={projects}
+          selectedProjectId={selectedProjectId}
+          onSelectProject={handleSelectProject}
+          levels={currentProject.levels}
           selectedLevelId={selectedLevelId}
           onSelectLevel={setSelectedLevelId}
           currentLevel={currentLevel}
@@ -44,13 +57,13 @@ export default function App() {
         </ViewModeProvider>
       </div>
       {showProjectAssets && (
-        <ProjectAssets levels={levels} onClose={() => setShowProjectAssets(false)} />
+        <ProjectAssets levels={currentProject.levels} projectName={currentProject.name} onClose={() => setShowProjectAssets(false)} />
       )}
       {showExport && (
         <ExportModal level={currentLevel} onClose={() => setShowExport(false)} />
       )}
       {showStatusReport && (
-        <StatusReport levels={levels} onClose={() => setShowStatusReport(false)} />
+        <StatusReport levels={currentProject.levels} onClose={() => setShowStatusReport(false)} />
       )}
     </div>
   );

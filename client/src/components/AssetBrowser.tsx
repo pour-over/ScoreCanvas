@@ -1,5 +1,5 @@
 import { useState, type DragEvent } from "react";
-import type { MusicAsset } from "../data/levels";
+import type { MusicAsset } from "../data/projects";
 import { auditionAsset, stopAudition, type AssetCategory } from "../audio/synth";
 
 interface AssetBrowserProps {

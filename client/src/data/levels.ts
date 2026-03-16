@@ -1,24 +1,5 @@
 import type { Node, Edge } from "@xyflow/react";
-
-export interface MusicAsset {
-  id: string;
-  filename: string;
-  category: "intro" | "loop" | "ending" | "transition" | "stinger" | "layer" | "ambient";
-  duration: string;
-  bpm: number;
-  key: string;
-  stems: string[];
-}
-
-export interface GameLevel {
-  id: string;
-  name: string;
-  subtitle: string;
-  region: string;
-  nodes: Node[];
-  edges: Edge[];
-  assets: MusicAsset[];
-}
+import type { MusicAsset, GameLevel } from "./projects";
 
 // ─── LEVEL 1: THE WHISPERING SANDS ──────────────────────────────────────────
 
@@ -327,7 +308,7 @@ const eternalSummitEdges: Edge[] = [
 
 // ─── EXPORT ─────────────────────────────────────────────────────────────────
 
-export const levels: GameLevel[] = [
+export const journey2Levels: GameLevel[] = [
   { id: "whispering-sands", name: "The Whispering Sands", subtitle: "Where Scarves Go to Die", region: "Act I \u2014 The Gentle Beginning", nodes: whisperingSandsNodes, edges: whisperingSandsEdges, assets: whisperingSandsAssets },
   { id: "babbling-brook", name: "The Babbling Brook of Devastation", subtitle: "Waters Run Red (With Cranberry Juice)", region: "Act I \u2014 The Gentle Beginning", nodes: babblingBrookNodes, edges: babblingBrookEdges, assets: babblingBrookAssets },
   { id: "tranquil-gardens", name: "The Tranquil Gardens of Unspeakable Horror", subtitle: "Stop and Smell the Carnage", region: "Act II \u2014 The Uncomfortable Middle", nodes: tranquilGardensNodes, edges: tranquilGardensEdges, assets: tranquilGardensAssets },

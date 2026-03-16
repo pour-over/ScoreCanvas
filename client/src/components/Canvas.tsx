@@ -18,7 +18,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { nodeTypes } from "../nodes";
-import type { GameLevel } from "../data/levels";
+import type { GameLevel } from "../data/projects";
 
 const defaultNodeData: Record<string, Record<string, unknown>> = {
   musicState: { label: "New State", intensity: 50, looping: true, stems: [], asset: "" },
