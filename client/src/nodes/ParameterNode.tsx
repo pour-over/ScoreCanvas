@@ -1,6 +1,7 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import { useViewMode } from "../context/ViewModeContext";
 import { StatusBadge } from "../components/StatusBadge";
+import { PlayButton } from "../components/PlayButton";
 
 interface ParameterData {
   [key: string]: unknown;
@@ -17,7 +18,7 @@ interface ParameterData {
 
 type ParameterNode = Node<ParameterData, "parameter">;
 
-export function ParameterNode({ data }: NodeProps<ParameterNode>) {
+export function ParameterNode({ data, id }: NodeProps<ParameterNode>) {
   const { mode } = useViewMode();
   const simple = mode === "simple";
   const pct = ((data.defaultValue - data.minValue) / (data.maxValue - data.minValue)) * 100;
@@ -29,7 +30,13 @@ export function ParameterNode({ data }: NodeProps<ParameterNode>) {
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-[#a855f7]" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
         </svg>
-        <span className="text-xs font-mono text-[#a855f7] uppercase tracking-wider">RTPC</span>
+        <span className="text-xs font-mono text-[#a855f7] uppercase tracking-wider flex-1">RTPC</span>
+        <PlayButton
+          nodeId={id}
+          category="ambient"
+          musicalKey="Dm"
+          bpm={120}
+        />
       </div>
       <div className="text-sm font-semibold text-canvas-text">{data.label}</div>
       {!simple && (

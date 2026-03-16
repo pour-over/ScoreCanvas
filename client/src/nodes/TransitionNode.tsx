@@ -1,11 +1,12 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import { useViewMode } from "../context/ViewModeContext";
 import { StatusBadge } from "../components/StatusBadge";
+import { PlayButton } from "../components/PlayButton";
 import type { TransitionData } from "../types";
 
 type TransitionNode = Node<TransitionData, "transition">;
 
-export function TransitionNode({ data }: NodeProps<TransitionNode>) {
+export function TransitionNode({ data, id }: NodeProps<TransitionNode>) {
   const { mode } = useViewMode();
   const simple = mode === "simple";
 
@@ -16,7 +17,15 @@ export function TransitionNode({ data }: NodeProps<TransitionNode>) {
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-canvas-highlight" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M5 12h14M13 5l7 7-7 7" />
         </svg>
-        <span className="text-xs font-mono text-canvas-muted uppercase tracking-wider">Transition</span>
+        <span className="text-xs font-mono text-canvas-muted uppercase tracking-wider flex-1">Transition</span>
+        <PlayButton
+          nodeId={id}
+          category="transition"
+          musicalKey="Dm"
+          bpm={120}
+          preRoll={{ category: "loop", durationMs: 3000 }}
+          postRoll={{ category: "loop", durationMs: 3000 }}
+        />
       </div>
       <div className="text-sm font-semibold text-canvas-text">{data.label}</div>
       {!simple && (

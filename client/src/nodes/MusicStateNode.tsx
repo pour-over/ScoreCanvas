@@ -1,6 +1,7 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import { useViewMode } from "../context/ViewModeContext";
 import { StatusBadge } from "../components/StatusBadge";
+import { PlayButton } from "../components/PlayButton";
 
 interface MusicStateData {
   [key: string]: unknown;
@@ -16,7 +17,7 @@ interface MusicStateData {
 
 type MusicStateNode = Node<MusicStateData, "musicState">;
 
-export function MusicStateNode({ data }: NodeProps<MusicStateNode>) {
+export function MusicStateNode({ data, id }: NodeProps<MusicStateNode>) {
   const { mode } = useViewMode();
   const simple = mode === "simple";
 
@@ -27,7 +28,13 @@ export function MusicStateNode({ data }: NodeProps<MusicStateNode>) {
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-canvas-highlight" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" />
         </svg>
-        <span className="text-xs font-mono text-canvas-muted uppercase tracking-wider">Music State</span>
+        <span className="text-xs font-mono text-canvas-muted uppercase tracking-wider flex-1">Music State</span>
+        <PlayButton
+          nodeId={id}
+          category={data.looping ? "loop" : "intro"}
+          musicalKey="Dm"
+          bpm={120}
+        />
       </div>
       <div className="text-sm font-semibold text-canvas-text">{data.label}</div>
       {!simple && (

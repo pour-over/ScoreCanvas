@@ -1,6 +1,7 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import { useViewMode } from "../context/ViewModeContext";
 import { StatusBadge } from "../components/StatusBadge";
+import { PlayButton } from "../components/PlayButton";
 
 interface EventData {
   [key: string]: unknown;
@@ -24,7 +25,7 @@ const eventTypeConfig: Record<string, { color: string; label: string }> = {
   qte: { color: "#fb923c", label: "QTE" },
 };
 
-export function EventNode({ data }: NodeProps<EventNode>) {
+export function EventNode({ data, id }: NodeProps<EventNode>) {
   const { mode } = useViewMode();
   const simple = mode === "simple";
   const config = eventTypeConfig[data.eventType] ?? eventTypeConfig.cinematic;
@@ -36,7 +37,13 @@ export function EventNode({ data }: NodeProps<EventNode>) {
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: config.color }}>
           <rect x="2" y="2" width="20" height="20" rx="2.18" /><path d="M10 8l6 4-6 4V8z" />
         </svg>
-        <span className="text-[10px] font-mono uppercase tracking-wider" style={{ color: config.color }}>{config.label}</span>
+        <span className="text-[10px] font-mono uppercase tracking-wider flex-1" style={{ color: config.color }}>{config.label}</span>
+        <PlayButton
+          nodeId={id}
+          category={data.eventType === "cinematic" || data.eventType === "igc" ? "intro" : "stinger"}
+          musicalKey="Dm"
+          bpm={120}
+        />
       </div>
       <div className="text-sm font-semibold text-canvas-text">{data.label}</div>
       {!simple && (

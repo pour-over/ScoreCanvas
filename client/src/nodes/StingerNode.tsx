@@ -1,6 +1,7 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import { useViewMode } from "../context/ViewModeContext";
 import { StatusBadge } from "../components/StatusBadge";
+import { PlayButton } from "../components/PlayButton";
 
 interface StingerData {
   [key: string]: unknown;
@@ -22,7 +23,7 @@ const priorityColors: Record<string, string> = {
   critical: "#ef4444",
 };
 
-export function StingerNode({ data }: NodeProps<StingerNode>) {
+export function StingerNode({ data, id }: NodeProps<StingerNode>) {
   const { mode } = useViewMode();
   const simple = mode === "simple";
   const color = priorityColors[data.priority] ?? "#6b7280";
@@ -34,7 +35,13 @@ export function StingerNode({ data }: NodeProps<StingerNode>) {
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color }}>
           <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
         </svg>
-        <span className="text-xs font-mono uppercase tracking-wider" style={{ color }}>Stinger</span>
+        <span className="text-xs font-mono uppercase tracking-wider flex-1" style={{ color }}>Stinger</span>
+        <PlayButton
+          nodeId={id}
+          category="stinger"
+          musicalKey="Dm"
+          bpm={120}
+        />
       </div>
       <div className="text-sm font-semibold text-canvas-text">{data.label}</div>
       {!simple && (
