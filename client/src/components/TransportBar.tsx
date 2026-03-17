@@ -6,21 +6,26 @@ import type { Node } from "@xyflow/react";
 type SpriteFrame = string[][];
 
 const JOURNEY_SPRITES: Record<string, SpriteFrame> = {
+  // Cat in a Journey scarf — pointy ears, round head, flowing red scarf tail
   run1: [
-    ["", "", "r", "r", "", ""],
-    ["", "r", "r", "r", "r", ""],
-    ["", "", "w", "w", "", ""],
-    ["", "w", "w", "w", "", ""],
-    ["", "", "w", "", "", ""],
-    ["", "w", "", "w", "", ""],
+    ["", "w", "", "", "w", "", "", ""],
+    ["", "w", "w", "w", "w", "", "", ""],
+    ["", "w", "g", "w", "g", "", "", ""],
+    ["", "", "w", "w", "w", "", "", ""],
+    ["", "r", "w", "w", "r", "r", "r", ""],
+    ["", "", "w", "w", "", "", "", "r"],
+    ["", "", "w", "", "", "", "", ""],
+    ["", "w", "", "w", "", "", "", ""],
   ],
   run2: [
-    ["", "", "r", "r", "", ""],
-    ["", "r", "r", "r", "r", ""],
-    ["", "", "w", "w", "", ""],
-    ["", "w", "w", "w", "", ""],
-    ["", "", "w", "", "", ""],
-    ["", "", "w", "w", "", ""],
+    ["", "w", "", "", "w", "", "", ""],
+    ["", "w", "w", "w", "w", "", "", ""],
+    ["", "w", "g", "w", "g", "", "", ""],
+    ["", "", "w", "w", "w", "", "", ""],
+    ["", "r", "w", "w", "r", "r", "", ""],
+    ["", "", "w", "w", "", "", "r", ""],
+    ["", "", "w", "", "", "", "", "r"],
+    ["", "", "w", "w", "", "", "", ""],
   ],
 };
 
@@ -85,9 +90,15 @@ function typeColor(t: string) {
   return "text-green-300";
 }
 
-// ─── Mini Sprite Scene ───────────────────────────────────────────────────────
+// ─── Sprite Runner (own dedicated lane) ─────────────────────────────────────
 
-function MiniSprite({ progress, isJourney, playing }: { progress: number; isJourney: boolean; playing: boolean }) {
+function SpriteRunner({ progress, isJourney, playing, nodeLabels, currentIndex }: {
+  progress: number;
+  isJourney: boolean;
+  playing: boolean;
+  nodeLabels: { label: string; type: string }[];
+  currentIndex: number;
+}) {
   const [frame, setFrame] = useState(0);
 
   useEffect(() => {
@@ -98,49 +109,85 @@ function MiniSprite({ progress, isJourney, playing }: { progress: number; isJour
 
   const sprites = isJourney ? JOURNEY_SPRITES : BLOODBORNE_SPRITES;
   const spriteData = frame % 2 === 0 ? sprites.run1 : sprites.run2;
-  const px = 4; // Bigger pixels!
-
-  if (!playing) return null;
+  const px = 3;
+  const accentColor = isJourney ? "#e94560" : "#c084fc";
 
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ opacity: 0.8 }}>
-      {/* Ground line */}
-      <div className="absolute left-0 right-0 h-px" style={{ bottom: 6, background: isJourney ? "#d4a76a44" : "#6b728044" }} />
+    <div className="relative h-8 mx-2 mb-1 rounded-md overflow-hidden" style={{ background: "#080814" }}>
+      {/* Terrain gradient at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-2" style={{
+        background: `linear-gradient(to top, ${isJourney ? "#1a150e" : "#0e0a14"}, transparent)`,
+      }} />
 
-      {/* Scenery elements */}
-      {[15, 75, 140, 210, 290, 380, 460, 540, 620, 700].map((x, i) => (
+      {/* Ground line */}
+      <div className="absolute left-0 right-0" style={{
+        bottom: 4, height: 1,
+        background: isJourney ? "#d4a76a30" : "#6b728030",
+      }} />
+
+      {/* Node markers along the path */}
+      {nodeLabels.map((nd, i) => {
+        const x = nodeLabels.length > 1 ? 4 + (i / (nodeLabels.length - 1)) * 92 : 50;
+        const isPast = i < currentIndex;
+        const isCurrent = i === currentIndex;
+        const markerColor = isCurrent ? "#4ade80" : isPast ? `${accentColor}66` : "#3a3a5c";
+        return (
+          <div key={i} className="absolute" style={{ left: `${x}%`, bottom: 1, transform: "translateX(-50%)" }}>
+            {/* Marker tick */}
+            <div style={{
+              width: nd.type === "transition" ? 4 : 2,
+              height: isCurrent ? 6 : 3,
+              background: markerColor,
+              borderRadius: 1,
+              margin: "0 auto",
+            }} />
+          </div>
+        );
+      })}
+
+      {/* Scenery */}
+      {[8, 22, 38, 52, 68, 82, 95].map((x, i) => (
         <div key={i} className="absolute" style={{
-          left: x, bottom: 8,
-          width: i % 2 === 0 ? 5 : 2,
-          height: i % 2 === 0 ? 4 : 6,
-          background: isJourney ? "#d4a76a25" : "#6b728025",
-          borderRadius: i % 2 === 0 ? "2px 2px 0 0" : 0,
+          left: `${x}%`, bottom: 5,
+          width: i % 2 === 0 ? 3 : 1,
+          height: i % 2 === 0 ? 3 : 5,
+          background: isJourney ? "#d4a76a15" : "#6b728015",
+          borderRadius: i % 2 === 0 ? "1px 1px 0 0" : 0,
         }} />
       ))}
 
-      {/* Character — centered vertically, bigger, with glow */}
-      <div
-        className="absolute transition-all duration-500 ease-out"
-        style={{
-          left: `${6 + progress * 85}%`,
-          bottom: 8,
-          transform: "translateX(-50%)",
-          filter: `drop-shadow(0 0 6px ${isJourney ? "#e9456088" : "#c084fc88"})`,
-        }}
-      >
-        <div style={{ imageRendering: "pixelated" as const }}>
-          {spriteData.map((row, ri) => (
-            <div key={ri} className="flex">
-              {row.map((pixel, ci) => (
-                <div key={ci} style={{
-                  width: px, height: px,
-                  background: pixel ? COLOR_MAP[pixel] ?? "transparent" : "transparent",
-                }} />
-              ))}
-            </div>
-          ))}
+      {/* Character */}
+      {playing && (
+        <div
+          className="absolute transition-all duration-500 ease-out"
+          style={{
+            left: `${4 + progress * 92}%`,
+            bottom: 6,
+            transform: "translateX(-50%)",
+            filter: `drop-shadow(0 0 4px ${accentColor}88)`,
+          }}
+        >
+          <div style={{ imageRendering: "pixelated" as const }}>
+            {spriteData.map((row, ri) => (
+              <div key={ri} className="flex">
+                {row.map((pixel, ci) => (
+                  <div key={ci} style={{
+                    width: px, height: px,
+                    background: pixel ? COLOR_MAP[pixel] ?? "transparent" : "transparent",
+                  }} />
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Idle state */}
+      {!playing && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-[8px] font-mono text-canvas-muted/30 tracking-wider">READY</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -174,7 +221,6 @@ export function TransportBar({
   const dragStart = useRef<{ mx: number; my: number; ox: number; oy: number }>({ mx: 0, my: 0, ox: 0, oy: 0 });
 
   const handleDragStart = useCallback((e: React.MouseEvent) => {
-    // Only drag from the header grip area
     if ((e.target as HTMLElement).closest("button, input")) return;
     isDragging.current = true;
     dragStart.current = { mx: e.clientX, my: e.clientY, ox: dragOffset.x, oy: dragOffset.y };
@@ -200,28 +246,29 @@ export function TransportBar({
 
   const currentNode = sequenceOrder[sequenceNodeIndex];
   const nextNode = sequenceOrder[sequenceNodeIndex + 1];
-  const afterNext = sequenceOrder[sequenceNodeIndex + 2];
 
   const currentLabel = currentNode ? (currentNode.data as Record<string, unknown>).label as string : "";
   const currentType = currentNode?.type ?? "musicState";
   const nextLabel = nextNode ? (nextNode.data as Record<string, unknown>).label as string : null;
   const nextType = nextNode?.type ?? "musicState";
-  const afterLabel = afterNext ? (afterNext.data as Record<string, unknown>).label as string : null;
-  const afterType = afterNext?.type ?? "musicState";
 
-  // Upcoming message
   let upcomingMsg = "";
-  if (nextType === "transition") upcomingMsg = "Coming up to transition!";
-  else if (nextType === "event") upcomingMsg = "Event cue incoming!";
-  else if (nextLabel) upcomingMsg = `Up next: ${nextLabel}`;
+  if (nextType === "transition") upcomingMsg = "→ transition next";
+  else if (nextType === "event") upcomingMsg = "★ event next";
+  else if (nextLabel) upcomingMsg = `next: ${nextLabel}`;
 
-  const progress = sequenceTotalNodes > 0 ? sequenceNodeIndex / sequenceTotalNodes : 0;
+  const progress = sequenceTotalNodes > 0 ? sequenceNodeIndex / Math.max(sequenceTotalNodes - 1, 1) : 0;
 
-  // Minimized: just a thin bar with play button and minimize toggle
+  const nodeLabels = sequenceOrder.map((n) => ({
+    label: (n.data as Record<string, unknown>).label as string,
+    type: n.type ?? "musicState",
+  }));
+
+  // Minimized
   if (minimized) {
     return (
-      <div className="flex items-center gap-2 px-2 py-1 rounded-lg bg-[#0d0d1a]/95 border border-canvas-accent backdrop-blur-sm shadow-2xl">
-        {/* Play/Stop */}
+      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0a0a18]/95 border border-canvas-accent/60 backdrop-blur-md shadow-2xl"
+        style={{ transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)` }}>
         <button onClick={onPlaySequence} className={`w-6 h-6 flex items-center justify-center rounded ${
           sequencePlaying ? "text-red-400" : "text-green-400"
         }`}>
@@ -231,14 +278,9 @@ export function TransportBar({
             <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><polygon points="1,0 10,5 1,10" /></svg>
           )}
         </button>
-
         {sequencePlaying && (
-          <span className="text-[9px] font-mono text-green-300 truncate max-w-[120px]">
-            ♪ {currentLabel}
-          </span>
+          <span className="text-[9px] font-mono text-green-300 truncate max-w-[120px]">♪ {currentLabel}</span>
         )}
-
-        {/* Progress dots (compact) */}
         {sequencePlaying && sequenceTotalNodes > 0 && (
           <div className="flex gap-px items-center">
             {sequenceOrder.map((_, idx) => (
@@ -250,10 +292,7 @@ export function TransportBar({
             ))}
           </div>
         )}
-
-        <button onClick={() => setMinimized(false)} className="text-canvas-muted hover:text-canvas-text text-[10px] ml-1" title="Expand transport">
-          ▲
-        </button>
+        <button onClick={() => setMinimized(false)} className="text-canvas-muted hover:text-canvas-text text-[10px] ml-1" title="Expand">▲</button>
       </div>
     );
   }
@@ -263,205 +302,184 @@ export function TransportBar({
       ref={dragRef}
       data-tour="transport"
       onMouseDown={handleDragStart}
-      className="relative rounded-xl bg-[#0a0a18]/95 border border-canvas-accent/60 backdrop-blur-md shadow-2xl overflow-hidden select-none"
-      style={{ minWidth: 600, maxWidth: 820, transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)`, cursor: isDragging.current ? "grabbing" : "grab" }}
+      className="rounded-xl bg-[#0a0a18]/95 border border-canvas-accent/60 backdrop-blur-md shadow-2xl select-none"
+      style={{ minWidth: 580, maxWidth: 780, transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)`, cursor: "grab" }}
     >
-      {/* Mini sprite scene — subtle, behind everything */}
-      {spriteVisible && (
-        <MiniSprite progress={progress} isJourney={isJourney} playing={sequencePlaying} />
-      )}
+      {/* ═══ Row 1: Controls ═══ */}
+      <div className="flex items-center gap-1.5 px-3 py-2">
 
-      {/* Main transport row */}
-      <div className="relative z-10 flex items-center gap-1 px-2 py-1.5">
+        {/* Play / Stop */}
+        <button
+          onClick={onPlaySequence}
+          className={`w-9 h-9 flex items-center justify-center rounded-lg border-2 transition-all ${
+            sequencePlaying
+              ? "bg-red-500/20 text-red-400 border-red-500/50 hover:bg-red-500/30"
+              : "bg-green-900/30 text-green-400 border-green-500/50 hover:bg-green-500/20"
+          }`}
+          title={sequencePlaying ? "Stop sequence" : "Play sequence"}
+        >
+          {sequencePlaying ? (
+            <svg width="14" height="14" viewBox="0 0 12 12" fill="currentColor"><rect x="2" y="2" width="8" height="8" rx="1" /></svg>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 12 12" fill="currentColor"><polygon points="2,0 12,6 2,12" /></svg>
+          )}
+        </button>
 
-        {/* ── Left: Playback controls ── */}
+        {/* Skip */}
+        <button
+          onClick={onSkipNext}
+          disabled={!sequencePlaying || sequenceNodeIndex >= sequenceTotalNodes - 1}
+          className={`w-7 h-9 flex items-center justify-center rounded-lg border transition-all ${
+            sequencePlaying && sequenceNodeIndex < sequenceTotalNodes - 1
+              ? "text-canvas-text border-canvas-accent/50 hover:bg-canvas-accent/20"
+              : "text-canvas-muted/25 border-canvas-accent/20 cursor-not-allowed"
+          }`}
+          title="Skip to next"
+        >
+          <svg width="11" height="10" viewBox="0 0 14 10" fill="currentColor">
+            <polygon points="0,0 8,5 0,10" />
+            <rect x="9" y="0" width="2.5" height="10" rx="0.5" />
+          </svg>
+        </button>
+
+        {/* Divider */}
+        <div className="w-px h-7 bg-canvas-accent/30" />
+
+        {/* Volume */}
         <div className="flex items-center gap-1">
-          {/* Play / Stop Sequence */}
-          <button
-            onClick={onPlaySequence}
-            className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-all ${
-              sequencePlaying
-                ? "bg-red-500/20 text-red-400 border-red-500/40 hover:bg-red-500/30"
-                : "bg-green-900/30 text-green-400 border-green-500/40 hover:bg-green-500/20"
-            }`}
-            title={sequencePlaying ? "Stop sequence" : "Play sequence"}
-          >
-            {sequencePlaying ? (
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><rect x="2" y="2" width="8" height="8" rx="1" /></svg>
-            ) : (
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><polygon points="2,0 12,6 2,12" /></svg>
-            )}
-          </button>
-
-          {/* Skip Next */}
-          <button
-            onClick={onSkipNext}
-            disabled={!sequencePlaying || sequenceNodeIndex >= sequenceTotalNodes - 1}
-            className={`w-7 h-8 flex items-center justify-center rounded-lg border transition-all ${
-              sequencePlaying && sequenceNodeIndex < sequenceTotalNodes - 1
-                ? "text-canvas-text border-canvas-accent/40 hover:bg-canvas-accent/20"
-                : "text-canvas-muted/30 border-canvas-accent/20 cursor-not-allowed"
-            }`}
-            title="Skip to next node"
-          >
-            <svg width="12" height="10" viewBox="0 0 14 10" fill="currentColor">
-              <polygon points="0,0 8,5 0,10" />
-              <rect x="9" y="0" width="2.5" height="10" rx="0.5" />
-            </svg>
-          </button>
-
-          {/* Divider */}
-          <div className="w-px h-6 bg-canvas-accent/30 mx-0.5" />
-
-          {/* Volume */}
-          <div className="flex items-center gap-1">
-            <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor" className="text-canvas-muted flex-shrink-0">
-              <path d="M8 1.5l-4 3H1v7h3l4 3V1.5z"/>
-              {volume > 0 && <path d="M11 4.5c1.2 1.2 1.2 5.8 0 7" fill="none" stroke="currentColor" strokeWidth="1.5"/>}
-              {volume > 0.5 && <path d="M13 2.5c2 2.5 2 8.5 0 11" fill="none" stroke="currentColor" strokeWidth="1.5"/>}
-            </svg>
-            <input
-              type="range" min="0" max="1" step="0.05" value={volume}
-              onChange={onVolumeChange}
-              className="w-14 h-1 accent-canvas-highlight cursor-pointer"
-              title={`Volume: ${Math.round(volume * 100)}%`}
-            />
-            <span className="text-[8px] font-mono text-canvas-muted/60 w-6 text-right">{Math.round(volume * 100)}%</span>
-          </div>
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" className="text-canvas-muted flex-shrink-0">
+            <path d="M8 1.5l-4 3H1v7h3l4 3V1.5z"/>
+            {volume > 0 && <path d="M11 4.5c1.2 1.2 1.2 5.8 0 7" fill="none" stroke="currentColor" strokeWidth="1.5"/>}
+            {volume > 0.5 && <path d="M13 2.5c2 2.5 2 8.5 0 11" fill="none" stroke="currentColor" strokeWidth="1.5"/>}
+          </svg>
+          <input
+            type="range" min="0" max="1" step="0.05" value={volume}
+            onChange={onVolumeChange}
+            className="w-16 h-1 accent-canvas-highlight cursor-pointer"
+          />
+          <span className="text-[8px] font-mono text-canvas-muted/50 w-7">{Math.round(volume * 100)}%</span>
         </div>
 
         {/* Divider */}
-        <div className="w-px h-6 bg-canvas-accent/30 mx-1" />
+        <div className="w-px h-7 bg-canvas-accent/30" />
 
-        {/* ── Center: Now Playing info ── */}
-        <div className="flex-1 min-w-0">
+        {/* Now Playing text */}
+        <div className="flex-1 min-w-0 px-1">
           {sequencePlaying && sequenceNodeId ? (
-            <div className="flex flex-col gap-0.5">
-              {/* Track name + counter */}
+            <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
                 <span className={`text-[11px] font-bold truncate ${typeColor(currentType)}`}>
                   {typeIcon(currentType)} {currentLabel}
                 </span>
-                {upcomingMsg && (
-                  <span className="text-[8px] text-amber-400/70 font-mono italic truncate hidden sm:inline">
-                    {upcomingMsg}
-                  </span>
-                )}
                 <span className="text-[9px] text-canvas-muted font-mono ml-auto flex-shrink-0">
                   {sequenceNodeIndex + 1}/{sequenceTotalNodes}
                 </span>
               </div>
-
-              {/* Sequence path + rewind dots */}
-              <div className="flex items-center gap-1">
-                {/* Compact path */}
-                <div className="flex items-center gap-0.5 text-[8px] font-mono truncate">
-                  <span className={`font-bold ${typeColor(currentType)}`}>{typeIcon(currentType)} {currentLabel}</span>
-                  {nextLabel && (
-                    <>
-                      <span className="text-canvas-muted/50 mx-px">→</span>
-                      <span className={typeColor(nextType)}>{typeIcon(nextType)} {nextLabel}</span>
-                    </>
-                  )}
-                  {afterLabel && (
-                    <>
-                      <span className="text-canvas-muted/50 mx-px">→</span>
-                      <span className={`${typeColor(afterType)} opacity-50`}>{typeIcon(afterType)} {afterLabel}</span>
-                    </>
-                  )}
-                </div>
-
-                {/* Rewind dots */}
-                <div className="flex items-center gap-px ml-auto flex-shrink-0">
-                  {sequenceOrder.map((nd, idx) => {
-                    const isCurrent = idx === sequenceNodeIndex;
-                    const isPast = idx < sequenceNodeIndex;
-                    const nType = nd?.type ?? "musicState";
-                    return (
-                      <button
-                        key={idx}
-                        onClick={() => onRewind(idx)}
-                        title={(nd?.data as Record<string, unknown>)?.label as string ?? `Node ${idx + 1}`}
-                        className="hover:scale-150 transition-transform"
-                      >
-                        <div style={{
-                          width: isCurrent ? 6 : nType === "transition" ? 4 : 3,
-                          height: isCurrent ? 6 : nType === "transition" ? 2 : 3,
-                          borderRadius: nType === "transition" ? 1 : 999,
-                          background: isCurrent ? "#4ade80" : isPast ? "#4ade8055" : "#3a3a5c",
-                          boxShadow: isCurrent ? "0 0 4px #4ade80" : "none",
-                        }} />
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+              {upcomingMsg && (
+                <span className="text-[8px] text-amber-400/60 font-mono italic truncate pl-3">{upcomingMsg}</span>
+              )}
             </div>
           ) : (
-            <div className="text-[10px] text-canvas-muted/50 font-mono text-center py-1">
-              Ready — press play to start sequence
+            <div className="text-[10px] text-canvas-muted/40 font-mono text-center">
+              Press play to start
             </div>
           )}
         </div>
 
         {/* Divider */}
-        <div className="w-px h-6 bg-canvas-accent/30 mx-1" />
+        <div className="w-px h-7 bg-canvas-accent/30" />
 
-        {/* ── Right: Mode toggle + sprite toggle + Stop All + minimize ── */}
-        <div className="flex items-center gap-1">
-          {/* Transitions Only / Full Score toggle */}
-          <button
-            data-tour="mode-toggle"
-            onClick={onToggleQuickMode}
-            className={`px-1.5 py-1 text-[9px] font-semibold rounded-md border transition-colors whitespace-nowrap ${
-              sequenceQuickMode
-                ? "bg-cyan-900/30 text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/20"
-                : "bg-amber-900/20 text-amber-400 border-amber-500/30 hover:bg-amber-500/20"
-            }`}
-            title={sequenceQuickMode ? "Transitions Only: plays ins/outs (~20s per node)" : "Full Score: plays entire file per node"}
-          >
-            {sequenceQuickMode ? "Transitions Only" : "Full Score"}
-          </button>
+        {/* Mode toggle */}
+        <button
+          data-tour="mode-toggle"
+          onClick={onToggleQuickMode}
+          className={`px-2 py-1.5 text-[9px] font-semibold rounded-md border transition-colors whitespace-nowrap ${
+            sequenceQuickMode
+              ? "bg-cyan-900/30 text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/20"
+              : "bg-amber-900/20 text-amber-400 border-amber-500/30 hover:bg-amber-500/20"
+          }`}
+          title={sequenceQuickMode ? "Transitions Only (~20s per node)" : "Full Score (entire file)"}
+        >
+          {sequenceQuickMode ? "Trans Check" : "Full Score"}
+        </button>
 
-          {/* Sprite toggle */}
-          <button
-            onClick={() => setSpriteVisible((v) => !v)}
-            className={`w-6 h-6 flex items-center justify-center rounded text-[10px] transition-colors ${
-              spriteVisible ? "text-canvas-muted/60 hover:text-canvas-text" : "text-canvas-muted/20 hover:text-canvas-muted/40"
-            }`}
-            title={spriteVisible ? "Hide sprite" : "Show sprite"}
-          >
-            🎮
-          </button>
+        {/* Sprite toggle */}
+        <button
+          onClick={() => setSpriteVisible((v) => !v)}
+          className={`w-6 h-6 flex items-center justify-center rounded text-[10px] transition-colors ${
+            spriteVisible ? "text-canvas-muted/60 hover:text-canvas-text" : "text-canvas-muted/20 hover:text-canvas-muted/40"
+          }`}
+          title={spriteVisible ? "Hide sprite" : "Show sprite"}
+        >
+          🎮
+        </button>
 
-          {/* Divider */}
-          <div className="w-px h-5 bg-canvas-accent/20 mx-0.5" />
+        {/* Divider */}
+        <div className="w-px h-7 bg-canvas-accent/30" />
 
-          {/* Stop All (panic) */}
-          <button
-            data-tour="stop-all"
-            onClick={onStopAll}
-            className="px-2 py-1 text-[9px] font-bold rounded-md bg-red-950/40 text-red-400/80 border border-red-500/25 hover:bg-red-500/25 hover:text-red-300 transition-colors whitespace-nowrap"
-            title="Stop all audio immediately"
-          >
-            ⏹ Stop All
-          </button>
+        {/* Stop All */}
+        <button
+          data-tour="stop-all"
+          onClick={onStopAll}
+          className="px-2.5 py-1.5 text-[9px] font-bold rounded-md bg-red-950/40 text-red-400/70 border border-red-500/20 hover:bg-red-500/25 hover:text-red-300 transition-colors whitespace-nowrap"
+          title="Stop all audio"
+        >
+          ⏹ Stop All
+        </button>
 
-          {/* Minimize */}
-          <button
-            onClick={() => setMinimized(true)}
-            className="w-5 h-5 flex items-center justify-center text-canvas-muted/40 hover:text-canvas-muted text-[9px] transition-colors"
-            title="Minimize transport"
-          >
-            ▼
-          </button>
-        </div>
+        {/* Minimize */}
+        <button
+          onClick={() => setMinimized(true)}
+          className="w-5 h-5 flex items-center justify-center text-canvas-muted/30 hover:text-canvas-muted text-[9px] transition-colors"
+          title="Minimize"
+        >
+          ▼
+        </button>
       </div>
 
-      {/* Progress bar at very bottom */}
+      {/* ═══ Row 2: Sprite runner + rewind dots (dedicated lane, separate from text) ═══ */}
+      {spriteVisible && (
+        <SpriteRunner
+          progress={progress}
+          isJourney={isJourney}
+          playing={sequencePlaying}
+          nodeLabels={nodeLabels}
+          currentIndex={sequenceNodeIndex}
+        />
+      )}
+
+      {/* ═══ Row 3: Rewind dots ═══ */}
+      {sequencePlaying && sequenceTotalNodes > 0 && (
+        <div className="flex items-center gap-0.5 px-3 pb-1.5 pt-0.5 justify-center">
+          {sequenceOrder.map((nd, idx) => {
+            const isCurrent = idx === sequenceNodeIndex;
+            const isPast = idx < sequenceNodeIndex;
+            const nType = nd?.type ?? "musicState";
+            return (
+              <button
+                key={idx}
+                onClick={() => onRewind(idx)}
+                title={(nd?.data as Record<string, unknown>)?.label as string ?? `Node ${idx + 1}`}
+                className="hover:scale-150 transition-transform p-0.5"
+              >
+                <div style={{
+                  width: isCurrent ? 8 : nType === "transition" ? 6 : 4,
+                  height: isCurrent ? 8 : nType === "transition" ? 3 : 4,
+                  borderRadius: nType === "transition" ? 1 : 999,
+                  background: isCurrent ? "#4ade80" : isPast ? "#4ade8055" : "#3a3a5c",
+                  boxShadow: isCurrent ? "0 0 6px #4ade80" : "none",
+                  transition: "all 0.3s",
+                }} />
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ═══ Progress bar ═══ */}
       {sequencePlaying && (
-        <div className="h-0.5 bg-canvas-accent/10">
+        <div className="h-0.5 bg-canvas-accent/10 rounded-b-xl overflow-hidden">
           <div
             className="h-full transition-all duration-500"
             style={{
