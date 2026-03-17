@@ -1,4 +1,4 @@
-import type { DragEvent } from "react";
+import { useState, type DragEvent } from "react";
 import type { GameLevel, GameProject } from "../data/projects";
 import { LevelBrowser } from "./LevelBrowser";
 import { AssetBrowser } from "./AssetBrowser";
@@ -21,11 +21,47 @@ interface SidebarProps {
   currentLevel: GameLevel;
 }
 
+function CollapsibleSection({ title, defaultOpen = true, count, children }: {
+  title: string;
+  defaultOpen?: boolean;
+  count?: number;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div>
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center gap-1.5 px-3 py-1.5 hover:bg-canvas-accent/20 transition-colors"
+      >
+        <svg
+          width="8" height="8" viewBox="0 0 8 8" fill="currentColor"
+          className={`text-canvas-muted/60 transition-transform duration-200 ${open ? "rotate-90" : ""}`}
+        >
+          <polygon points="1,0 7,4 1,8" />
+        </svg>
+        <span className="text-[10px] font-mono uppercase tracking-widest text-canvas-muted flex-1 text-left">{title}</span>
+        {count !== undefined && (
+          <span className="text-[9px] font-mono text-canvas-muted/40">{count}</span>
+        )}
+      </button>
+      {open && <div className="px-3 pb-2">{children}</div>}
+    </div>
+  );
+}
+
 export function Sidebar({ projects, selectedProjectId, onSelectProject, levels, selectedLevelId, onSelectLevel, currentLevel }: SidebarProps) {
+  const [showAllAssets, setShowAllAssets] = useState(false);
+
   const onDragStart = (event: DragEvent, nodeType: string) => {
     event.dataTransfer.setData("application/scorecanvas-node", nodeType);
     event.dataTransfer.effectAllowed = "move";
   };
+
+  // Collect all assets across levels for "All Assets" mode
+  const allAssets = showAllAssets
+    ? levels.flatMap((l) => l.assets.map((a) => ({ ...a, id: `${l.id}-${a.id}` })))
+    : currentLevel.assets;
 
   return (
     <aside data-tour="sidebar" className="w-60 bg-[#0d0d1a] border-r border-canvas-accent flex flex-col shrink-0 overflow-hidden">
@@ -51,36 +87,61 @@ export function Sidebar({ projects, selectedProjectId, onSelectProject, levels, 
 
       <div className="mx-3 border-t border-canvas-accent" />
 
-      {/* Level Browser */}
-      <div className="px-3 pt-2 pb-2 overflow-y-auto max-h-[260px]">
-        <LevelBrowser levels={levels} selectedId={selectedLevelId} onSelect={onSelectLevel} />
-      </div>
+      {/* Scrollable content area */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin">
+        {/* Levels */}
+        <CollapsibleSection title="Levels" count={levels.length}>
+          <LevelBrowser levels={levels} selectedId={selectedLevelId} onSelect={onSelectLevel} />
+        </CollapsibleSection>
 
-      <div className="mx-3 border-t border-canvas-accent" />
+        <div className="mx-3 border-t border-canvas-accent" />
 
-      {/* Node Palette */}
-      <div className="px-3 py-2">
-        <h2 className="text-[10px] font-mono uppercase tracking-widest text-canvas-muted px-1 mb-2">Add Nodes</h2>
-        <div className="grid grid-cols-2 gap-1.5">
-          {nodeTemplates.map((tpl) => (
-            <div
-              key={tpl.type}
-              className="bg-canvas-bg border border-canvas-accent rounded px-2 py-1.5 cursor-grab active:cursor-grabbing hover:border-canvas-highlight/50 transition-colors"
-              draggable
-              onDragStart={(e) => onDragStart(e, tpl.type)}
+        {/* Node Palette */}
+        <CollapsibleSection title="Add Nodes" defaultOpen={false} count={nodeTemplates.length}>
+          <div className="grid grid-cols-2 gap-1.5">
+            {nodeTemplates.map((tpl) => (
+              <div
+                key={tpl.type}
+                className="bg-canvas-bg border border-canvas-accent rounded px-2 py-1.5 cursor-grab active:cursor-grabbing hover:border-canvas-highlight/50 transition-colors"
+                draggable
+                onDragStart={(e) => onDragStart(e, tpl.type)}
+              >
+                <div className="text-[10px] font-medium text-canvas-text">{tpl.label}</div>
+                <div className="text-[9px] text-canvas-muted leading-tight">{tpl.description}</div>
+              </div>
+            ))}
+          </div>
+        </CollapsibleSection>
+
+        <div className="mx-3 border-t border-canvas-accent" />
+
+        {/* Level Assets */}
+        <CollapsibleSection title="Level Assets" count={allAssets.length}>
+          {/* Toggle: This Level / All Levels */}
+          <div className="flex gap-1 mb-2">
+            <button
+              onClick={() => setShowAllAssets(false)}
+              className={`flex-1 px-1.5 py-0.5 text-[9px] font-mono rounded transition-colors ${
+                !showAllAssets
+                  ? "bg-canvas-highlight/20 text-canvas-highlight border border-canvas-highlight/30"
+                  : "text-canvas-muted border border-canvas-accent hover:text-canvas-text"
+              }`}
             >
-              <div className="text-[10px] font-medium text-canvas-text">{tpl.label}</div>
-              <div className="text-[9px] text-canvas-muted leading-tight">{tpl.description}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="mx-3 border-t border-canvas-accent" />
-
-      {/* Asset Browser */}
-      <div className="px-3 py-2 overflow-y-auto flex-1">
-        <AssetBrowser assets={currentLevel.assets} />
+              This Level
+            </button>
+            <button
+              onClick={() => setShowAllAssets(true)}
+              className={`flex-1 px-1.5 py-0.5 text-[9px] font-mono rounded transition-colors ${
+                showAllAssets
+                  ? "bg-canvas-highlight/20 text-canvas-highlight border border-canvas-highlight/30"
+                  : "text-canvas-muted border border-canvas-accent hover:text-canvas-text"
+              }`}
+            >
+              All Levels
+            </button>
+          </div>
+          <AssetBrowser assets={allAssets} />
+        </CollapsibleSection>
       </div>
     </aside>
   );

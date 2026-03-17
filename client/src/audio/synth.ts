@@ -67,6 +67,8 @@ async function loadAudioBuffer(url: string): Promise<AudioBuffer | null> {
 interface FilePlaybackOptions {
   /** "full" plays entire file; "transition" plays first 10s + last 10s with fades */
   mode?: "full" | "transition";
+  /** Semitones to pitch-shift (uses playbackRate) */
+  pitchShift?: number;
 }
 
 async function playAudioFile(
@@ -80,9 +82,11 @@ async function playAudioFile(
   const ac = getCtx();
   const master = getMaster();
   const mode = opts.mode ?? "full";
+  const pitchRate = opts.pitchShift ? Math.pow(2, opts.pitchShift / 12) : 1;
   const now = ac.currentTime;
   const source = ac.createBufferSource();
   source.buffer = buffer;
+  if (pitchRate !== 1) source.playbackRate.value = pitchRate;
   const fileGain = ac.createGain();
   source.connect(fileGain);
   fileGain.connect(master);
@@ -110,6 +114,7 @@ async function playAudioFile(
     // Second segment (last 10 seconds)
     const source2 = ac.createBufferSource();
     source2.buffer = buffer;
+    if (pitchRate !== 1) source2.playbackRate.value = pitchRate;
     const fileGain2 = ac.createGain();
     source2.connect(fileGain2);
     fileGain2.connect(master);
@@ -150,6 +155,8 @@ export interface AuditionParams {
   audioFile?: string;
   /** "full" plays entire file; "transition" plays first/last 10s with fades */
   playbackMode?: "full" | "transition";
+  /** Semitones to pitch-shift (positive = up, negative = down) */
+  pitchShift?: number;
 }
 
 /** Stop with a smooth 3.5s fadeout */
@@ -217,8 +224,12 @@ export async function auditionAsset(params: AuditionParams): Promise<number> {
     return 0;
   }
 
+  // Stingers get +3 semitones pitch shift by default (shakuhachi flute)
+  const pitchShift = params.pitchShift ?? (params.category === "stinger" ? 3 : 0);
+
   const durationMs = await playAudioFile(params.audioFile, {
     mode: params.playbackMode ?? "full",
+    pitchShift,
   });
 
   if (durationMs !== null) {
