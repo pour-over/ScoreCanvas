@@ -81,8 +81,6 @@ async function playAudioFile(
   const master = getMaster();
   const mode = opts.mode ?? "full";
   const now = ac.currentTime;
-  const fadeDur = 1.5;
-
   const source = ac.createBufferSource();
   source.buffer = buffer;
   const fileGain = ac.createGain();
@@ -92,16 +90,20 @@ async function playAudioFile(
   activeSources.push(source);
   activeFileGains.push(fileGain);
 
+  // Consistent fade duration: 3.5s everywhere (matches stopAudition)
+  const fadeOut = 3.5;
+  const fadeIn = 1.0;
+
   if (mode === "transition" && buffer.duration > 22) {
-    // Play first 10s (fade in 0.5s, fade out last 1.5s), gap, then last 10s (fade in 1.5s, fade out last 1s)
+    // Transition Check: first 10s (fade in 1s, fade out 3.5s), gap, then last 10s (fade in 1s, fade out 3.5s)
     const firstDur = 10;
     const lastDur = 10;
-    const gapDur = 0.3;
+    const gapDur = 0.5;
 
     // First segment
     fileGain.gain.setValueAtTime(0, now);
-    fileGain.gain.linearRampToValueAtTime(1, now + 0.5);
-    fileGain.gain.setValueAtTime(1, now + firstDur - fadeDur);
+    fileGain.gain.linearRampToValueAtTime(1, now + fadeIn);
+    fileGain.gain.setValueAtTime(1, now + firstDur - fadeOut);
     fileGain.gain.linearRampToValueAtTime(0, now + firstDur);
     source.start(now, 0, firstDur);
 
@@ -117,18 +119,18 @@ async function playAudioFile(
     const seg2Start = now + firstDur + gapDur;
     const offset2 = Math.max(0, buffer.duration - lastDur);
     fileGain2.gain.setValueAtTime(0, seg2Start);
-    fileGain2.gain.linearRampToValueAtTime(1, seg2Start + fadeDur);
-    fileGain2.gain.setValueAtTime(1, seg2Start + lastDur - 1);
+    fileGain2.gain.linearRampToValueAtTime(1, seg2Start + fadeIn);
+    fileGain2.gain.setValueAtTime(1, seg2Start + lastDur - fadeOut);
     fileGain2.gain.linearRampToValueAtTime(0, seg2Start + lastDur);
     source2.start(seg2Start, offset2, lastDur);
 
     return (firstDur + gapDur + lastDur) * 1000;
   } else {
-    // Full playback with gentle fade in/out
+    // Full playback with matching fade in/out
     fileGain.gain.setValueAtTime(0, now);
-    fileGain.gain.linearRampToValueAtTime(1, now + Math.min(0.3, buffer.duration * 0.1));
-    if (buffer.duration > 1) {
-      fileGain.gain.setValueAtTime(1, now + buffer.duration - Math.min(fadeDur, buffer.duration * 0.2));
+    fileGain.gain.linearRampToValueAtTime(1, now + Math.min(fadeIn, buffer.duration * 0.1));
+    if (buffer.duration > fadeOut) {
+      fileGain.gain.setValueAtTime(1, now + buffer.duration - fadeOut);
       fileGain.gain.linearRampToValueAtTime(0, now + buffer.duration);
     }
     source.start(now);

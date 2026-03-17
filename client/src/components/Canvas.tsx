@@ -457,17 +457,17 @@ export function Canvas({ level, projectId }: CanvasProps) {
               )}
             </button>
 
-            {/* Quick/Full toggle */}
+            {/* Transition Check / Full toggle */}
             <button
               onClick={() => setSequenceQuickMode((q) => !q)}
               className={`px-2 py-1.5 text-[10px] font-semibold rounded-lg border transition-colors backdrop-blur-sm shadow-lg ${
                 sequenceQuickMode
-                  ? "bg-[#0d0d1a]/90 text-canvas-muted border-canvas-accent hover:text-canvas-text"
-                  : "bg-amber-900/30 text-amber-400 border-amber-500/40"
+                  ? "bg-cyan-900/30 text-cyan-400 border-cyan-500/40 hover:bg-cyan-500/20"
+                  : "bg-amber-900/30 text-amber-400 border-amber-500/40 hover:bg-amber-500/20"
               }`}
-              title={sequenceQuickMode ? "Quick: ~20s preview per node" : "Full: play entire file per node"}
+              title={sequenceQuickMode ? "Transition Check: plays ins/outs of every change (~20s per node)" : "Full Score: plays entire file per node"}
             >
-              {sequenceQuickMode ? "Quick" : "Full"}
+              {sequenceQuickMode ? "Trans Check" : "Full Score"}
             </button>
 
             <button

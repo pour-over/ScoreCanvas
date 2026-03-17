@@ -31,7 +31,8 @@
       "Bash(grep 'id: \"\"\"\"a-' client/src/data/bloodborne2.ts)",
       "Bash(ls /Users/tedkocher/Desktop/ClaudeCode/ScoreCanvas/audio/*Shakuhachi*)",
       "Bash(ls /Users/tedkocher/Desktop/ClaudeCode/ScoreCanvas/audio/*061*)",
-      "Bash(ls /Users/tedkocher/Desktop/ClaudeCode/ScoreCanvas/audio/*Wanderer*)"
+      "Bash(ls /Users/tedkocher/Desktop/ClaudeCode/ScoreCanvas/audio/*Wanderer*)",
+      "Bash(npx netlify-cli:*)"
     ]
   }
 }
