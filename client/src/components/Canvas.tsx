@@ -2,6 +2,7 @@ import { useCallback, useRef, useEffect, useState, type DragEvent } from "react"
 import { useViewMode } from "../context/ViewModeContext";
 import { auditionAsset, stopAudition, setVolume, getVolume, type AssetCategory } from "../audio/synth";
 import { TransportBar } from "./TransportBar";
+import { PlayingNodeProvider } from "../context/PlayingNodeContext";
 import {
   ReactFlow,
   Background,
@@ -465,6 +466,7 @@ export function Canvas({ level, projectId }: CanvasProps) {
   }, [sequencePlaying]);
 
   return (
+    <PlayingNodeProvider value={sequenceNodeId}>
     <div ref={reactFlowWrapper} className="flex-1 h-full">
       <ReactFlow
         nodes={nodes}
@@ -591,5 +593,6 @@ export function Canvas({ level, projectId }: CanvasProps) {
         </Panel>
       </ReactFlow>
     </div>
+    </PlayingNodeProvider>
   );
 }

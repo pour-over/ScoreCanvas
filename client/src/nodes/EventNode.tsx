@@ -1,5 +1,6 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import { useViewMode } from "../context/ViewModeContext";
+import { usePlayingNode } from "../context/PlayingNodeContext";
 import { StatusBadge } from "../components/StatusBadge";
 import { PlayButton } from "../components/PlayButton";
 
@@ -29,9 +30,14 @@ export function EventNode({ data, id }: NodeProps<EventNode>) {
   const { mode } = useViewMode();
   const simple = mode === "simple";
   const config = eventTypeConfig[data.eventType] ?? eventTypeConfig.cinematic;
+  const playingId = usePlayingNode();
+  const isPlaying = playingId === id;
 
   return (
-    <div className={`bg-[#1a1520] border-2 rounded-lg shadow-lg ${simple ? "px-3 py-2 min-w-[120px]" : "px-4 py-3 min-w-[180px]"}`} style={{ borderColor: config.color }}>
+    <div
+      className={`bg-[#1a1520] border-2 rounded-lg shadow-lg ${simple ? "px-3 py-2 min-w-[120px]" : "px-4 py-3 min-w-[180px]"} ${isPlaying ? "ring-2 ring-cyan-400/40 shadow-cyan-500/30 shadow-xl" : ""}`}
+      style={{ borderColor: isPlaying ? "#22d3ee" : config.color, animation: isPlaying ? "pulse 2s ease-in-out infinite" : undefined }}
+    >
       <Handle type="target" position={Position.Left} className="!w-3 !h-3" style={{ background: config.color }} />
       <div className="flex items-center gap-1.5 mb-1">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: config.color }}>

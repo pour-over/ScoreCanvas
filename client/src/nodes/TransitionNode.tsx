@@ -1,5 +1,6 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import { useViewMode } from "../context/ViewModeContext";
+import { usePlayingNode } from "../context/PlayingNodeContext";
 import { StatusBadge } from "../components/StatusBadge";
 import { PlayButton } from "../components/PlayButton";
 import type { TransitionData } from "../types";
@@ -9,9 +10,14 @@ type TransitionNode = Node<TransitionData, "transition">;
 export function TransitionNode({ data, id }: NodeProps<TransitionNode>) {
   const { mode } = useViewMode();
   const simple = mode === "simple";
+  const playingId = usePlayingNode();
+  const isPlaying = playingId === id;
 
   return (
-    <div className={`bg-canvas-accent border-2 border-canvas-highlight rounded-md shadow-lg ${simple ? "px-2 py-1.5 min-w-[100px]" : "px-3 py-2 min-w-[140px]"}`}>
+    <div
+      className={`bg-canvas-accent border-2 rounded-md shadow-lg ${simple ? "px-2 py-1.5 min-w-[100px]" : "px-3 py-2 min-w-[140px]"} ${isPlaying ? "border-red-400 ring-2 ring-red-400/40 shadow-red-500/30 shadow-xl" : "border-canvas-highlight"}`}
+      style={isPlaying ? { animation: "pulse 2s ease-in-out infinite" } : undefined}
+    >
       <Handle type="target" position={Position.Left} className="!bg-canvas-text !w-2.5 !h-2.5" />
       <div className="flex items-center gap-1.5 mb-1">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-canvas-highlight" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

@@ -1,5 +1,6 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import { useViewMode } from "../context/ViewModeContext";
+import { usePlayingNode } from "../context/PlayingNodeContext";
 import { StatusBadge } from "../components/StatusBadge";
 import { PlayButton } from "../components/PlayButton";
 
@@ -20,9 +21,14 @@ type MusicStateNode = Node<MusicStateData, "musicState">;
 export function MusicStateNode({ data, id }: NodeProps<MusicStateNode>) {
   const { mode } = useViewMode();
   const simple = mode === "simple";
+  const playingId = usePlayingNode();
+  const isPlaying = playingId === id;
 
   return (
-    <div className={`bg-canvas-surface border-2 border-canvas-accent rounded-lg shadow-lg shadow-blue-900/10 ${simple ? "px-3 py-2 min-w-[120px]" : "px-4 py-3 min-w-[180px]"}`}>
+    <div
+      className={`bg-canvas-surface border-2 rounded-lg shadow-lg ${simple ? "px-3 py-2 min-w-[120px]" : "px-4 py-3 min-w-[180px]"} ${isPlaying ? "border-green-400 ring-2 ring-green-400/40 shadow-green-500/30 shadow-xl" : "border-canvas-accent shadow-blue-900/10"}`}
+      style={isPlaying ? { animation: "pulse 2s ease-in-out infinite" } : undefined}
+    >
       <Handle type="target" position={Position.Left} className="!bg-canvas-highlight !w-3 !h-3" />
       <div className="flex items-center gap-1.5 mb-1">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-canvas-highlight" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
