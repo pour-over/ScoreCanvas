@@ -14,7 +14,6 @@ export function LevelBrowser({ levels, selectedId, onSelect }: LevelBrowserProps
 
   return (
     <div className="flex flex-col gap-1">
-      <h2 className="text-[10px] font-mono uppercase tracking-widest text-canvas-muted px-1 mb-1">Levels</h2>
       {Object.entries(grouped).map(([region, regionLevels]) => (
         <div key={region}>
           <div className="text-[9px] font-mono uppercase tracking-wider text-canvas-muted/60 px-2 pt-2 pb-1">{region}</div>

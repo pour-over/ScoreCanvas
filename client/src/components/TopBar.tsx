@@ -55,13 +55,6 @@ export function TopBar({
           Project Assets
         </button>
         <button
-          data-tour="export"
-          onClick={onOpenExport}
-          className="px-2.5 py-1 text-[11px] font-semibold rounded bg-canvas-highlight/80 text-white border border-canvas-highlight hover:bg-canvas-highlight transition-colors"
-        >
-          Export Schema
-        </button>
-        <button
           onClick={onOpenStatusReport}
           className="px-2.5 py-1 text-[11px] font-semibold rounded bg-emerald-600/80 text-white border border-emerald-500 hover:bg-emerald-600 transition-colors"
         >
@@ -92,6 +85,14 @@ export function TopBar({
         <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
         <span className="text-[11px] text-canvas-muted">Live</span>
       </div>
+      <div className="w-px h-5 bg-canvas-accent" />
+      <button
+        data-tour="export"
+        onClick={onOpenExport}
+        className="px-2.5 py-1 text-[11px] font-semibold rounded bg-canvas-highlight/80 text-white border border-canvas-highlight hover:bg-canvas-highlight transition-colors"
+      >
+        Export Schema
+      </button>
       {onStartTour && (
         <>
           <div className="w-px h-5 bg-canvas-accent" />

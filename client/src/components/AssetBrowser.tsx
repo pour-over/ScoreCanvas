@@ -58,14 +58,13 @@ export function AssetBrowser({ assets }: AssetBrowserProps) {
 
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex items-center justify-between px-1 mb-1">
-        <h2 className="text-[10px] font-mono uppercase tracking-widest text-canvas-muted">Music Assets</h2>
-        {playingId && (
+      {playingId && (
+        <div className="flex justify-end px-1 mb-1">
           <button onClick={handleStop} className="text-[9px] font-mono text-canvas-highlight hover:text-white transition-colors">
             STOP
           </button>
-        )}
-      </div>
+        </div>
+      )}
       {sorted.map((cat) => (
         <div key={cat}>
           <div className="flex items-center gap-1.5 px-2 pt-2 pb-1">
