@@ -52,7 +52,7 @@ export default function App() {
         />
         <ViewModeProvider>
           <ReactFlowProvider>
-            <Canvas level={currentLevel} />
+            <Canvas level={currentLevel} projectId={currentProject.id} />
           </ReactFlowProvider>
         </ViewModeProvider>
       </div>

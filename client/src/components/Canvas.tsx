@@ -19,6 +19,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { nodeTypes } from "../nodes";
 import type { GameLevel } from "../data/projects";
+import { PixelRunner } from "./PixelRunner";
 
 const defaultNodeData: Record<string, Record<string, unknown>> = {
   musicState: { label: "New State", intensity: 50, looping: true, stems: [], asset: "" },
@@ -93,9 +94,10 @@ function autoLayout(nodes: Node[], edges: Edge[]): Node[] {
 
 interface CanvasProps {
   level: GameLevel;
+  projectId: string;
 }
 
-export function Canvas({ level }: CanvasProps) {
+export function Canvas({ level, projectId }: CanvasProps) {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(level.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(level.edges);
@@ -168,6 +170,9 @@ export function Canvas({ level }: CanvasProps) {
   // ─── Play Sequence: walk graph and audition each node ──────────────────────
   const [sequencePlaying, setSequencePlaying] = useState(false);
   const [sequenceNodeId, setSequenceNodeId] = useState<string | null>(null);
+  const [sequenceNodeType, setSequenceNodeType] = useState<string | null>(null);
+  const [sequenceNodeIndex, setSequenceNodeIndex] = useState(0);
+  const [sequenceTotalNodes, setSequenceTotalNodes] = useState(0);
   const [sequenceFullDuration, setSequenceFullDuration] = useState(false);
   const sequenceAbort = useRef(false);
 
@@ -177,6 +182,9 @@ export function Canvas({ level }: CanvasProps) {
       stopAudition();
       setSequencePlaying(false);
       setSequenceNodeId(null);
+      setSequenceNodeType(null);
+      setSequenceNodeIndex(0);
+      setSequenceTotalNodes(0);
       return;
     }
 
@@ -248,6 +256,7 @@ export function Canvas({ level }: CanvasProps) {
 
     sequenceAbort.current = false;
     setSequencePlaying(true);
+    setSequenceTotalNodes(order.length);
 
     // Play nodes one at a time
     let i = 0;
@@ -255,11 +264,16 @@ export function Canvas({ level }: CanvasProps) {
       if (sequenceAbort.current || i >= order.length) {
         setSequencePlaying(false);
         setSequenceNodeId(null);
+        setSequenceNodeType(null);
+        setSequenceNodeIndex(0);
+        setSequenceTotalNodes(0);
         return;
       }
       const n = order[i];
       const { category, durationMs, audioFile } = nodeToAudition(n);
       setSequenceNodeId(n.id);
+      setSequenceNodeType(n.type ?? null);
+      setSequenceNodeIndex(i);
       await auditionAsset({
         id: n.id,
         category,
@@ -371,6 +385,18 @@ export function Canvas({ level }: CanvasProps) {
               <span className="px-2 py-1 text-[10px] font-mono bg-green-900/40 text-green-300 border border-green-500/30 rounded-md backdrop-blur-sm">
                 ▶ {nodes.find((n) => n.id === sequenceNodeId)?.data?.label as string ?? sequenceNodeId}
               </span>
+            </div>
+          )}
+          {sequencePlaying && (
+            <div className="mt-2" style={{ width: 360 }}>
+              <PixelRunner
+                playing={sequencePlaying}
+                currentNodeId={sequenceNodeId}
+                currentNodeType={sequenceNodeType}
+                projectId={projectId}
+                totalNodes={sequenceTotalNodes}
+                currentNodeIndex={sequenceNodeIndex}
+              />
             </div>
           )}
         </Panel>
