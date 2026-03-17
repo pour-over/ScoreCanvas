@@ -173,8 +173,76 @@ export function Canvas({ level, projectId }: CanvasProps) {
   const [sequenceNodeType, setSequenceNodeType] = useState<string | null>(null);
   const [sequenceNodeIndex, setSequenceNodeIndex] = useState(0);
   const [sequenceTotalNodes, setSequenceTotalNodes] = useState(0);
-  const [sequenceFullDuration, setSequenceFullDuration] = useState(false);
   const sequenceAbort = useRef(false);
+  const sequenceOrderRef = useRef<Node[]>([]);
+
+  // Rewind: jump back to a specific node index in the sequence
+  const handleSequenceRewind = useCallback((targetIndex: number) => {
+    if (!sequencePlaying || targetIndex < 0 || targetIndex >= sequenceOrderRef.current.length) return;
+    // Stop current playback, restart from targetIndex
+    stopAudition();
+    const playOrder = sequenceOrderRef.current;
+    const n = playOrder[targetIndex];
+    setSequenceNodeId(n.id);
+    setSequenceNodeType(n.type ?? null);
+    setSequenceNodeIndex(targetIndex);
+
+    // Find audio for this node
+    const d = n.data as Record<string, unknown>;
+    const assetRef = d.asset as string | undefined;
+    let audioFile: string | undefined;
+    if (n.type === "transition") {
+      audioFile = "transition_sweep.mp3";
+    } else if (assetRef && level?.assets) {
+      const matched = level.assets.find((a: { filename?: string; id: string; audioFile?: string }) => a.filename === assetRef || a.id === assetRef);
+      if (matched?.audioFile) audioFile = matched.audioFile;
+    }
+    if (!audioFile && level?.assets) {
+      const amb = level.assets.find((a: { audioFile?: string; category?: string }) => a.audioFile && (a.category === "ambient" || a.category === "layer" || a.category === "loop"));
+      if (amb?.audioFile) audioFile = amb.audioFile;
+      else {
+        const any = level.assets.find((a: { audioFile?: string; category?: string }) => a.audioFile && a.category !== "transition" && a.category !== "stinger");
+        if (any?.audioFile) audioFile = any.audioFile;
+      }
+    }
+
+    const category: AssetCategory = n.type === "transition" ? "transition" : "loop";
+    auditionAsset({ id: n.id, category, key: "Dm", bpm: 120, audioFile, playbackMode: "full" }).then((durationMs) => {
+      let i = targetIndex + 1;
+      function playNext() {
+        if (sequenceAbort.current || i >= playOrder.length) {
+          setSequencePlaying(false);
+          setSequenceNodeId(null);
+          setSequenceNodeType(null);
+          setSequenceNodeIndex(0);
+          setSequenceTotalNodes(0);
+          return;
+        }
+        const nn = playOrder[i];
+        const dd = nn.data as Record<string, unknown>;
+        const ar = dd.asset as string | undefined;
+        let af: string | undefined;
+        if (nn.type === "transition") af = "transition_sweep.mp3";
+        else if (ar && level?.assets) {
+          const m = level.assets.find((a: { filename?: string; id: string; audioFile?: string }) => a.filename === ar || a.id === ar);
+          if (m?.audioFile) af = m.audioFile;
+        }
+        if (!af && level?.assets) {
+          const f = level.assets.find((a: { audioFile?: string; category?: string }) => a.audioFile && a.category !== "transition");
+          if (f?.audioFile) af = f.audioFile;
+        }
+        setSequenceNodeId(nn.id);
+        setSequenceNodeType(nn.type ?? null);
+        setSequenceNodeIndex(i);
+        const cat: AssetCategory = nn.type === "transition" ? "transition" : "loop";
+        auditionAsset({ id: nn.id, category: cat, key: "Dm", bpm: 120, audioFile: af, playbackMode: "full" }).then((dur) => {
+          i++;
+          setTimeout(playNext, (dur > 0 ? dur : 1000) + 300);
+        });
+      }
+      setTimeout(playNext, (durationMs > 0 ? durationMs : 1000) + 300);
+    });
+  }, [sequencePlaying, level]);
 
   const handlePlaySequence = useCallback(() => {
     if (sequencePlaying) {
@@ -218,50 +286,55 @@ export function Canvas({ level, projectId }: CanvasProps) {
     // Add any disconnected nodes
     nodes.forEach((n) => { if (!visited.has(n.id)) order.push(n); });
 
-    // Map node type → synth category + duration
-    const useTransitionMode = !sequenceFullDuration;
-    function nodeToAudition(n: Node): { category: AssetCategory; durationMs: number; audioFile?: string } {
+    // Resolve audio file for a node
+    function findAudioFile(n: Node): string | undefined {
       const d = n.data as Record<string, unknown>;
-      // Try to find audio file from level assets
+      // Music states / stingers have an asset reference
       const assetRef = d.asset as string | undefined;
-      let audioFile: string | undefined;
       if (assetRef && level?.assets) {
-        const matchedAsset = level.assets.find((a) => a.filename === assetRef || a.id === assetRef);
-        if (matchedAsset?.audioFile) audioFile = matchedAsset.audioFile;
+        const matched = level.assets.find((a) => a.filename === assetRef || a.id === assetRef);
+        if (matched?.audioFile) return matched.audioFile;
       }
-
-      switch (n.type) {
-        case "musicState": {
-          const looping = d.looping as boolean;
-          return looping
-            ? { category: "loop", durationMs: useTransitionMode ? 10500 : 30000, audioFile }
-            : { category: "intro", durationMs: useTransitionMode ? 10500 : 20000, audioFile };
+      // Events (cinematics, IGCs) — find connected musicState's audio
+      if (n.type === "event" || n.type === "parameter") {
+        // Look at edges from/to this node, find a musicState neighbor
+        const connectedIds = edges
+          .filter((e) => e.source === n.id || e.target === n.id)
+          .map((e) => e.source === n.id ? e.target : e.source);
+        for (const cid of connectedIds) {
+          const neighbor = nodes.find((nn) => nn.id === cid && nn.type === "musicState");
+          if (neighbor) {
+            const nd = neighbor.data as Record<string, unknown>;
+            const nAsset = nd.asset as string | undefined;
+            if (nAsset && level?.assets) {
+              const m = level.assets.find((a) => a.filename === nAsset || a.id === nAsset);
+              if (m?.audioFile) return m.audioFile;
+            }
+          }
         }
-        case "transition":
-          return { category: "transition", durationMs: 3500, audioFile: "transition_sweep.mp3" };
-        case "stinger":
-          return { category: "stinger", durationMs: useTransitionMode ? 5000 : 10000, audioFile };
-        case "parameter":
-          return { category: "ambient", durationMs: useTransitionMode ? 5000 : 10000, audioFile };
-        case "event": {
-          const et = d.eventType as string;
-          return et === "cinematic" || et === "igc"
-            ? { category: "intro", durationMs: useTransitionMode ? 10500 : 20000, audioFile }
-            : { category: "stinger", durationMs: useTransitionMode ? 5000 : 8000, audioFile };
+        // Fallback: prioritize ambient/loop/layer assets
+        if (level?.assets?.length) {
+          const ambient = level.assets.find((a) => a.audioFile && (a.category === "ambient" || a.category === "layer" || a.category === "loop"));
+          if (ambient?.audioFile) return ambient.audioFile;
+          const any = level.assets.find((a) => a.audioFile && a.category !== "transition" && a.category !== "stinger");
+          if (any?.audioFile) return any.audioFile;
         }
-        default:
-          return { category: "loop", durationMs: useTransitionMode ? 10500 : 15000, audioFile };
       }
+      return undefined;
     }
+
+    // Filter: skip stingers from the playback order
+    const playOrder = order.filter((n) => n.type !== "stinger");
 
     sequenceAbort.current = false;
     setSequencePlaying(true);
-    setSequenceTotalNodes(order.length);
+    setSequenceTotalNodes(playOrder.length);
+    sequenceOrderRef.current = playOrder;
 
-    // Play nodes one at a time
+    // Play nodes one at a time — full file duration, then move on
     let i = 0;
     async function playNext() {
-      if (sequenceAbort.current || i >= order.length) {
+      if (sequenceAbort.current || i >= playOrder.length) {
         setSequencePlaying(false);
         setSequenceNodeId(null);
         setSequenceNodeType(null);
@@ -269,24 +342,31 @@ export function Canvas({ level, projectId }: CanvasProps) {
         setSequenceTotalNodes(0);
         return;
       }
-      const n = order[i];
-      const { category, durationMs, audioFile } = nodeToAudition(n);
+      const n = playOrder[i];
+      const audioFile = n.type === "transition" ? "transition_sweep.mp3" : findAudioFile(n);
+      const category: AssetCategory = n.type === "transition" ? "transition" : "loop";
+
       setSequenceNodeId(n.id);
       setSequenceNodeType(n.type ?? null);
       setSequenceNodeIndex(i);
-      await auditionAsset({
+
+      // Always play full — transitions get full with tail, everything else full duration
+      const actualDurationMs = await auditionAsset({
         id: n.id,
         category,
         key: "Dm",
         bpm: 120,
         audioFile,
-        playbackMode: useTransitionMode ? "transition" : "full",
+        playbackMode: "full",
       });
+
       i++;
-      setTimeout(playNext, durationMs + 300);
+      // Wait for actual file to finish, then advance (300ms gap between nodes)
+      const waitMs = actualDurationMs > 0 ? actualDurationMs + 300 : 1000;
+      setTimeout(playNext, waitMs);
     }
     playNext();
-  }, [sequencePlaying, sequenceFullDuration, nodes, edges, level]);
+  }, [sequencePlaying, nodes, edges, level]);
 
   return (
     <div ref={reactFlowWrapper} className="flex-1 h-full">
@@ -350,19 +430,6 @@ export function Canvas({ level, projectId }: CanvasProps) {
               )}
             </button>
 
-            {/* Sequence mode toggle */}
-            <button
-              onClick={() => setSequenceFullDuration((f) => !f)}
-              className={`px-2 py-1.5 text-[10px] font-semibold rounded-lg border transition-colors backdrop-blur-sm shadow-lg ${
-                sequenceFullDuration
-                  ? "bg-amber-900/30 text-amber-400 border-amber-500/40"
-                  : "bg-[#0d0d1a]/90 text-canvas-muted border-canvas-accent hover:text-canvas-text"
-              }`}
-              title={sequenceFullDuration ? "Playing full duration of each file" : "Quick preview: first/last 5s of each file"}
-            >
-              {sequenceFullDuration ? "Full" : "Quick"}
-            </button>
-
             <button
               onClick={toggleViewMode}
               className={`px-3 py-1.5 text-[11px] font-semibold rounded-lg border transition-colors backdrop-blur-sm shadow-lg ${
@@ -396,6 +463,8 @@ export function Canvas({ level, projectId }: CanvasProps) {
                 projectId={projectId}
                 totalNodes={sequenceTotalNodes}
                 currentNodeIndex={sequenceNodeIndex}
+                onRewind={handleSequenceRewind}
+                nodeLabels={sequenceOrderRef.current.map((n) => (n.data as Record<string, unknown>).label as string ?? n.id)}
               />
             </div>
           )}

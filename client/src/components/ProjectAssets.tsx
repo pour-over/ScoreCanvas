@@ -31,14 +31,10 @@ export function ProjectAssets({ levels, projectName, onClose }: ProjectAssetsPro
   const categories = ["all", "intro", "loop", "transition", "stinger", "ending", "layer", "ambient"];
 
   const handlePlay = async (asset: MusicAsset) => {
-    const started = await auditionAsset({ id: asset.id, category: asset.category as AssetCategory, key: asset.key, bpm: asset.bpm, audioFile: asset.audioFile });
-    setPlayingId(started ? asset.id : null);
-    if (started && !asset.audioFile) {
-      const durations: Record<string, number> = {
-        intro: 3200, loop: ((60 / (asset.bpm || 120)) * 8 + 0.5) * 1000,
-        ending: 4200, transition: 1700, stinger: 1000, layer: 5200, ambient: 5200,
-      };
-      setTimeout(() => setPlayingId((curr) => curr === asset.id ? null : curr), durations[asset.category]);
+    const durationMs = await auditionAsset({ id: asset.id, category: asset.category as AssetCategory, key: asset.key, bpm: asset.bpm, audioFile: asset.audioFile });
+    setPlayingId(durationMs > 0 ? asset.id : null);
+    if (durationMs > 0) {
+      setTimeout(() => setPlayingId((curr) => curr === asset.id ? null : curr), durationMs + 200);
     }
   };
 

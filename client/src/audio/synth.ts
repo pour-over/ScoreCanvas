@@ -150,38 +150,69 @@ export interface AuditionParams {
   playbackMode?: "full" | "transition";
 }
 
+/** Stop with a smooth 3.5s fadeout */
 export function stopAudition() {
-  activeSources.forEach((src) => {
-    try { src.stop(); } catch { /* already stopped */ }
-  });
-  activeSources = [];
-  activeFileGains = [];
   activeTimeouts.forEach((t) => clearTimeout(t));
   activeTimeouts = [];
+
+  if (ctx && activeFileGains.length > 0) {
+    const now = ctx.currentTime;
+    const fadeDuration = 3.5;
+    activeFileGains.forEach((g) => {
+      try {
+        g.gain.cancelScheduledValues(now);
+        g.gain.setValueAtTime(g.gain.value, now);
+        g.gain.linearRampToValueAtTime(0, now + fadeDuration);
+      } catch { /* already disconnected */ }
+    });
+    // Schedule actual stop after fade completes
+    const sources = [...activeSources];
+    const gains = [...activeFileGains];
+    setTimeout(() => {
+      sources.forEach((src) => { try { src.stop(); } catch { /* done */ } });
+      gains.forEach((g) => { try { g.disconnect(); } catch { /* done */ } });
+    }, fadeDuration * 1000 + 100);
+  } else {
+    activeSources.forEach((src) => { try { src.stop(); } catch { /* done */ } });
+  }
+
+  activeSources = [];
+  activeFileGains = [];
   isPlaying = false;
   currentAssetId = null;
 }
 
-export async function auditionAsset(params: AuditionParams): Promise<boolean> {
+/** Immediate stop (no fade) — used internally when switching tracks */
+function stopImmediate() {
+  activeTimeouts.forEach((t) => clearTimeout(t));
+  activeTimeouts = [];
+  activeSources.forEach((src) => { try { src.stop(); } catch { /* done */ } });
+  activeSources = [];
+  activeFileGains = [];
+  isPlaying = false;
+  currentAssetId = null;
+}
+
+/** Returns actual playback duration in ms, or 0 if nothing played */
+export async function auditionAsset(params: AuditionParams): Promise<number> {
   getCtx();
 
   // Toggle off if same asset
   if (isPlaying && currentAssetId === params.id) {
-    stopAudition();
-    return false;
+    stopAudition(); // fade out
+    return 0;
   }
 
-  // Stop previous
-  stopAudition();
+  // Stop previous immediately (no fade) to switch tracks cleanly
+  stopImmediate();
 
   isPlaying = true;
   currentAssetId = params.id;
 
   if (!params.audioFile) {
-    // No audio file assigned — nothing to play
     isPlaying = false;
     currentAssetId = null;
-    return false;
+    return 0;
   }
 
   const durationMs = await playAudioFile(params.audioFile, {
@@ -194,13 +225,12 @@ export async function auditionAsset(params: AuditionParams): Promise<boolean> {
       currentAssetId = null;
     }, durationMs + 200);
     activeTimeouts.push(timeout);
-    return true;
+    return durationMs;
   }
 
-  // File failed to load
   isPlaying = false;
   currentAssetId = null;
-  return false;
+  return 0;
 }
 
 export function getPlayingAssetId(): string | null {

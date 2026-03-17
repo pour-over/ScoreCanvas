@@ -11,7 +11,27 @@
       "Bash(git push:*)",
       "Bash(npx -y @netlify/mcp@latest --proxy-path \"https://netlify-mcp.netlify.app/proxy/eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..tXO79IlBlymlLhqo.Lvamac9hZVd3cgpZGYWeo46nPEMDYvjTbTmy6zxb3AkMhu3LurtYggVYIxRhxGHNday_xuaenIc00NdT8vr1as86pZUwNoWzb-VQQnpPUQ7NSsbGZTm4cqm63cMPyQyfM8kZaPn_YpDBG7QHHo7jzI7KP2OzAFAkR-XXUb1c2qeg7mVzhxTdvebT4IeROcfe6mAvvaBjqp8e0rcZYyjDjnQLCJ_a1Nm6ed2PcakK_QF0ENoMCvI4VREPrEyYtNSwRqeHRHTirWXQVg.RIdOJ_MYHZGUkzst6FvV8Q\")",
       "Bash(npx -y netlify-cli --version)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(netlify deploy:*)",
+      "Bash(netlify sites:create --name score-canvas)",
+      "Bash(netlify sites:create --name score-canvas --account-slug pourover)",
+      "Bash(netlify api:*)",
+      "Bash(netlify sites:create --name score-canvas --account-slug tedkocher)",
+      "Bash(netlify unlink:*)",
+      "Bash(netlify link:*)",
+      "Bash(npx tsc:*)",
+      "Bash(netlify status:*)",
+      "Bash(NETLIFY_SITE_ID=69b719272cfc726de047431d npx netlify-cli deploy --prod --dir=client/dist --filter score-canvas-client)",
+      "Bash(npx netlify:*)",
+      "mcp__plugin_context-mode_context-mode__execute_file",
+      "mcp__plugin_context-mode_context-mode__execute",
+      "Bash(find /Users/tedkocher/Desktop/ClaudeCode/ScoreCanvas -name state.json -path */.netlify/*)",
+      "Bash(grep -r \"AudioContext\\\\|HTMLAudioElement\\\\|new Audio\\\\|fetch.*mp3\\\\|fetch.*wav\\\\|import.*audio\" /Users/tedkocher/Desktop/ClaudeCode/ScoreCanvas/client/src --include=*.ts --include=*.tsx)",
+      "Bash(grep -c 'id: \"\"\"\"a-' client/src/data/bloodborne2.ts)",
+      "Bash(grep 'id: \"\"\"\"a-' client/src/data/bloodborne2.ts)",
+      "Bash(ls /Users/tedkocher/Desktop/ClaudeCode/ScoreCanvas/audio/*Shakuhachi*)",
+      "Bash(ls /Users/tedkocher/Desktop/ClaudeCode/ScoreCanvas/audio/*061*)",
+      "Bash(ls /Users/tedkocher/Desktop/ClaudeCode/ScoreCanvas/audio/*Wanderer*)"
     ]
   }
 }

@@ -35,13 +35,10 @@ export function AssetBrowser({ assets }: AssetBrowserProps) {
       bpm: asset.bpm,
       audioFile: asset.audioFile,
     });
-    setPlayingId(started ? asset.id : null);
-    if (started && !asset.audioFile) {
-      const durations: Record<string, number> = {
-        intro: 3200, loop: ((60 / (asset.bpm || 120)) * 8 + 0.5) * 1000,
-        ending: 4200, transition: 1700, stinger: 1000, layer: 5200, ambient: 5200,
-      };
-      setTimeout(() => setPlayingId((curr) => curr === asset.id ? null : curr), durations[asset.category]);
+    const durationMs = started;
+    setPlayingId(durationMs > 0 ? asset.id : null);
+    if (durationMs > 0) {
+      setTimeout(() => setPlayingId((curr) => curr === asset.id ? null : curr), durationMs + 200);
     }
   };
 

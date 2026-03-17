@@ -13,6 +13,8 @@ interface PixelRunnerProps {
   projectId: string; // "journey-2" | "bloodborne-2"
   totalNodes: number;
   currentNodeIndex: number;
+  onRewind?: (targetIndex: number) => void;
+  nodeLabels?: string[];
 }
 
 // ─── Sprite definitions (CSS pixel art) ─────────────────────────────────────
@@ -183,6 +185,8 @@ export function PixelRunner({
   projectId,
   totalNodes,
   currentNodeIndex,
+  onRewind,
+  nodeLabels,
 }: PixelRunnerProps) {
   const [frame, setFrame] = useState(0);
   const [action, setAction] = useState<"run" | "jump" | "duck" | "power">("run");
@@ -332,12 +336,50 @@ export function PixelRunner({
         ))}
       </div>
 
-      {/* Progress bar (subtle) */}
-      <div className="absolute bottom-0 left-0 h-px" style={{
+      {/* Progress bar */}
+      <div className="absolute bottom-0 left-0 h-0.5" style={{
         width: `${progress * 100}%`,
-        background: isJourney ? "#e9456088" : "#c084fc88",
+        background: isJourney ? "#e94560aa" : "#c084fcaa",
         transition: "width 0.5s ease",
       }} />
+
+      {/* Rewind node markers — clickable dots along the progress bar */}
+      {onRewind && totalNodes > 0 && (
+        <div className="absolute bottom-0 left-0 right-0 h-3 flex items-end">
+          {Array.from({ length: totalNodes }, (_, idx) => {
+            const markerX = 8 + (idx / totalNodes) * 80;
+            const isCurrent = idx === currentNodeIndex;
+            const isPast = idx < currentNodeIndex;
+            return (
+              <button
+                key={idx}
+                onClick={(e) => { e.stopPropagation(); onRewind(idx); }}
+                className="absolute group"
+                style={{ left: `${markerX}%`, bottom: 0, transform: "translateX(-50%)" }}
+                title={nodeLabels?.[idx] ?? `Node ${idx + 1}`}
+              >
+                <div
+                  className="rounded-full transition-all"
+                  style={{
+                    width: isCurrent ? 6 : 4,
+                    height: isCurrent ? 6 : 4,
+                    background: isCurrent
+                      ? (isJourney ? "#e94560" : "#c084fc")
+                      : isPast
+                        ? (isJourney ? "#e9456066" : "#c084fc66")
+                        : (isJourney ? "#d4a76a33" : "#6b728033"),
+                    boxShadow: isCurrent ? `0 0 4px ${isJourney ? "#e94560" : "#c084fc"}` : "none",
+                  }}
+                />
+                {/* Tooltip on hover */}
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 hidden group-hover:block whitespace-nowrap px-1.5 py-0.5 rounded text-[7px] font-mono bg-black/90 border border-white/10 text-white/80 z-50">
+                  {nodeLabels?.[idx] ?? `Node ${idx + 1}`}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* Character */}
       <div

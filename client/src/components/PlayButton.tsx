@@ -70,8 +70,8 @@ export function PlayButton({
         }, preRoll.durationMs);
       } else {
         setPhase("main");
-        const stillPlaying = await auditionAsset({ id: nodeId, category, key: musicalKey, bpm, audioFile, playbackMode });
-        if (!stillPlaying) {
+        const durationMs = await auditionAsset({ id: nodeId, category, key: musicalKey, bpm, audioFile, playbackMode });
+        if (durationMs === 0) {
           setPlaying(false);
           setPhase("idle");
         }
