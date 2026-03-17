@@ -4,7 +4,7 @@ import type { MusicAsset, GameLevel } from "./projects";
 // ─── LEVEL 1: THE WHISPERING SANDS ──────────────────────────────────────────
 
 const whisperingSandsAssets: MusicAsset[] = [
-  { id: "a-ws-01", filename: "mus_sands_scarf_awakens_intro", category: "intro", duration: "0:28", bpm: 88, key: "Dm", stems: ["scarf_flap_menacing", "choir_passive_aggressive", "wind_judgmental"], audioFile: "journey2/mus_journey2_main_theme_intro.mp3" },
+  { id: "a-ws-01", filename: "mus_sands_scarf_awakens_intro", category: "intro", duration: "0:28", bpm: 88, key: "Dm", stems: ["scarf_flap_menacing", "choir_passive_aggressive", "wind_judgmental"], audioFile: "journey2/mus_sands_gentle_hugs_combat_hi.mp3" },
   { id: "a-ws-02", filename: "mus_sands_bloodcurdling_serenity_loop", category: "loop", duration: "2:12", bpm: 88, key: "Dm", stems: ["harp_of_doom", "flute_ominous_peace", "strings_deceptive_calm", "perc_sand_shuffle"], audioFile: "journey2/mus_sands_gentle_hugs_explore.mp3" },
   { id: "a-ws-03", filename: "mus_sands_false_tranquility_loop", category: "loop", duration: "2:12", bpm: 88, key: "Dm", stems: ["kalimba_threat", "pad_sinister_warmth", "bass_lurking"], audioFile: "journey2/mus_sands_false_tranquility_loop.mp3" },
   { id: "a-ws-04", filename: "mus_sands_gentle_hugs_combat_lo", category: "loop", duration: "1:08", bpm: 132, key: "Dm", stems: ["perc_sand_whale_stomp", "brass_affectionate_violence", "strings_concerned", "synth_dune_rage"], audioFile: "journey2/mus_sands_gentle_hugs_combat_hi.mp3" },

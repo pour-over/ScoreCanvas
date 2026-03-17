@@ -198,8 +198,28 @@ export function Canvas({ level, projectId }: CanvasProps) {
   const [sequenceNodeIndex, setSequenceNodeIndex] = useState(0);
   const [sequenceTotalNodes, setSequenceTotalNodes] = useState(0);
   const [sequenceQuickMode, setSequenceQuickMode] = useState(false);
+  const [jumpInput, setJumpInput] = useState("");
+  const [jumpSuggestions, setJumpSuggestions] = useState<Array<{ idx: number; label: string; type: string }>>([]);
   const sequenceAbort = useRef(false);
   const sequenceOrderRef = useRef<Node[]>([]);
+
+  // Jump to node by search
+  const handleJumpSearch = useCallback((query: string) => {
+    setJumpInput(query);
+    if (!query.trim()) { setJumpSuggestions([]); return; }
+    const q = query.toLowerCase();
+    // Search all nodes (not just sequence order)
+    const matches = nodes
+      .map((n, idx) => ({
+        idx,
+        label: (n.data as Record<string, unknown>).label as string ?? n.id,
+        type: n.type ?? "musicState",
+        id: n.id,
+      }))
+      .filter((m) => m.label.toLowerCase().includes(q) || m.type.toLowerCase().includes(q) || String(m.idx + 1) === q)
+      .slice(0, 6);
+    setJumpSuggestions(matches);
+  }, [nodes]);
 
   // Rewind: jump back to a specific node index in the sequence
   const handleSequenceRewind = useCallback((targetIndex: number) => {
@@ -268,6 +288,35 @@ export function Canvas({ level, projectId }: CanvasProps) {
       setTimeout(playNext, (durationMs > 0 ? durationMs : 1000) + 300);
     });
   }, [sequencePlaying, level]);
+
+  const handleJumpTo = useCallback((nodeId: string) => {
+    if (sequencePlaying) {
+      const idx = sequenceOrderRef.current.findIndex((n) => n.id === nodeId);
+      if (idx >= 0) handleSequenceRewind(idx);
+    } else {
+      const node = nodes.find((n) => n.id === nodeId);
+      if (!node) return;
+      const d = node.data as Record<string, unknown>;
+      const assetRef = d.asset as string | undefined;
+      let audioFile: string | undefined;
+      if (assetRef && level?.assets) {
+        const matched = level.assets.find((a: { filename?: string; id: string; audioFile?: string }) => a.filename === assetRef || a.id === assetRef);
+        if (matched?.audioFile) audioFile = matched.audioFile;
+      }
+      if (!audioFile && level?.assets) {
+        const amb = level.assets.find((a: { audioFile?: string; category?: string }) => a.audioFile && (a.category === "ambient" || a.category === "layer" || a.category === "loop"));
+        if (amb?.audioFile) audioFile = amb.audioFile;
+      }
+      if (node.type === "transition") audioFile = "transition_sweep.mp3";
+      auditionAsset({
+        id: node.id,
+        category: (node.type === "transition" ? "transition" : "loop") as AssetCategory,
+        key: "Dm", bpm: 120, audioFile, playbackMode: "full",
+      });
+    }
+    setJumpInput("");
+    setJumpSuggestions([]);
+  }, [sequencePlaying, nodes, level, handleSequenceRewind]);
 
   const handlePlaySequence = useCallback(() => {
     if (sequencePlaying) {
@@ -435,6 +484,25 @@ export function Canvas({ level, projectId }: CanvasProps) {
               <span className="text-[9px] font-mono text-canvas-muted w-7 text-right">{Math.round(volume * 100)}%</span>
             </div>
 
+            {/* Panic: stop ALL audio */}
+            <button
+              onClick={() => {
+                stopAudition();
+                if (sequencePlaying) {
+                  sequenceAbort.current = true;
+                  setSequencePlaying(false);
+                  setSequenceNodeId(null);
+                  setSequenceNodeType(null);
+                  setSequenceNodeIndex(0);
+                  setSequenceTotalNodes(0);
+                }
+              }}
+              className="px-2 py-1.5 text-[10px] font-bold rounded-lg bg-red-900/30 text-red-400 border border-red-500/40 hover:bg-red-500/30 transition-colors backdrop-blur-sm shadow-lg"
+              title="PANIC — Stop all audio immediately"
+            >
+              ⏹ STOP
+            </button>
+
             {/* Play Sequence */}
             <button
               onClick={handlePlaySequence}
@@ -486,6 +554,39 @@ export function Canvas({ level, projectId }: CanvasProps) {
             >
               Clean Up View
             </button>
+
+            {/* Jump to node */}
+            <div className="relative">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#0d0d1a]/90 border border-canvas-accent backdrop-blur-sm shadow-lg">
+                <span className="text-[10px] text-canvas-muted">⎆</span>
+                <input
+                  type="text"
+                  value={jumpInput}
+                  onChange={(e) => handleJumpSearch(e.target.value)}
+                  placeholder="Check node..."
+                  className="w-24 bg-transparent text-[10px] text-canvas-text font-mono placeholder:text-canvas-muted/50 outline-none"
+                />
+              </div>
+              {jumpSuggestions.length > 0 && (
+                <div className="absolute top-full right-0 mt-1 w-56 bg-[#0d0d1a]/98 border border-canvas-accent rounded-lg backdrop-blur-sm shadow-2xl z-50 overflow-hidden">
+                  {jumpSuggestions.map((s) => {
+                    const icon = s.type === "transition" ? "→" : s.type === "stinger" ? "◆" : s.type === "event" ? "★" : s.type === "parameter" ? "◎" : "♪";
+                    const color = s.type === "transition" ? "text-red-400" : s.type === "stinger" ? "text-orange-400" : s.type === "event" ? "text-cyan-400" : s.type === "parameter" ? "text-purple-400" : "text-green-300";
+                    return (
+                      <button
+                        key={s.idx}
+                        onClick={() => handleJumpTo(nodes[s.idx].id)}
+                        className="w-full px-3 py-1.5 text-left hover:bg-canvas-accent/30 transition-colors flex items-center gap-2"
+                      >
+                        <span className={`text-[11px] ${color}`}>{icon}</span>
+                        <span className="text-[10px] text-canvas-text font-mono truncate">{s.label}</span>
+                        <span className="text-[8px] text-canvas-muted ml-auto">{s.type}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
           {sequencePlaying && sequenceNodeId && (() => {
             const order = sequenceOrderRef.current;
