@@ -19,7 +19,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { nodeTypes } from "../nodes";
 import type { GameLevel } from "../data/projects";
-import { PixelRunner } from "./PixelRunner";
+// Pixel sprite is rendered inline on the canvas during sequence playback
 
 const defaultNodeData: Record<string, Record<string, unknown>> = {
   musicState: { label: "New State", intensity: 50, looping: true, stems: [], asset: "" },
@@ -101,7 +101,7 @@ export function Canvas({ level, projectId }: CanvasProps) {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(level.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(level.edges);
-  const { screenToFlowPosition, fitView } = useReactFlow();
+  const { screenToFlowPosition, flowToScreenPosition, fitView } = useReactFlow();
   const { mode, toggle: toggleViewMode } = useViewMode();
 
   useEffect(() => {
@@ -120,6 +120,20 @@ export function Canvas({ level, projectId }: CanvasProps) {
     event.dataTransfer.dropEffect = "move";
   }, []);
 
+  // ─── Undo stack for asset drops ──────────────────────────────────────────
+  const [undoToast, setUndoToast] = useState<{ nodeId: string; nodeName: string; prevAsset: string; newAsset: string } | null>(null);
+  const undoTimerRef = useRef<number | null>(null);
+
+  const handleUndo = useCallback(() => {
+    if (!undoToast) return;
+    const { nodeId, prevAsset } = undoToast;
+    setNodes((nds) =>
+      nds.map((n) => n.id === nodeId ? { ...n, data: { ...n.data, asset: prevAsset } } : n)
+    );
+    setUndoToast(null);
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+  }, [undoToast, setNodes]);
+
   const onDrop = useCallback(
     (event: DragEvent) => {
       event.preventDefault();
@@ -132,13 +146,23 @@ export function Canvas({ level, projectId }: CanvasProps) {
           const nodeId = target.getAttribute("data-id");
           if (nodeId) {
             const asset = JSON.parse(assetData);
-            setNodes((nds) =>
-              nds.map((n) =>
-                n.id === nodeId && n.type === "musicState"
-                  ? { ...n, data: { ...n.data, asset: asset.filename } }
-                  : n
-              )
-            );
+            // Find the node and save previous asset for undo
+            const targetNode = nodes.find((n) => n.id === nodeId);
+            if (targetNode) {
+              const prevAsset = (targetNode.data as Record<string, unknown>).asset as string ?? "";
+              const nodeName = (targetNode.data as Record<string, unknown>).label as string ?? nodeId;
+              setNodes((nds) =>
+                nds.map((n) =>
+                  n.id === nodeId
+                    ? { ...n, data: { ...n.data, asset: asset.filename } }
+                    : n
+                )
+              );
+              // Show undo toast
+              if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+              setUndoToast({ nodeId, nodeName, prevAsset, newAsset: asset.filename });
+              undoTimerRef.current = window.setTimeout(() => setUndoToast(null), 8000);
+            }
           }
         }
         return;
@@ -151,7 +175,7 @@ export function Canvas({ level, projectId }: CanvasProps) {
       const newNode: Node = { id: getId(), type, position, data: { ...defaultNodeData[type] } };
       setNodes((nds) => [...nds, newNode]);
     },
-    [screenToFlowPosition, setNodes]
+    [screenToFlowPosition, setNodes, nodes]
   );
 
   const handleCleanUp = useCallback(() => {
@@ -170,9 +194,10 @@ export function Canvas({ level, projectId }: CanvasProps) {
   // ─── Play Sequence: walk graph and audition each node ──────────────────────
   const [sequencePlaying, setSequencePlaying] = useState(false);
   const [sequenceNodeId, setSequenceNodeId] = useState<string | null>(null);
-  const [sequenceNodeType, setSequenceNodeType] = useState<string | null>(null);
+  const [, setSequenceNodeType] = useState<string | null>(null);
   const [sequenceNodeIndex, setSequenceNodeIndex] = useState(0);
   const [sequenceTotalNodes, setSequenceTotalNodes] = useState(0);
+  const [sequenceQuickMode, setSequenceQuickMode] = useState(false);
   const sequenceAbort = useRef(false);
   const sequenceOrderRef = useRef<Node[]>([]);
 
@@ -350,19 +375,21 @@ export function Canvas({ level, projectId }: CanvasProps) {
       setSequenceNodeType(n.type ?? null);
       setSequenceNodeIndex(i);
 
-      // Always play full — transitions get full with tail, everything else full duration
+      // Quick mode: transition preview (first/last 10s = ~20s), Full mode: entire file
+      const isQuick = sequenceQuickMode;
       const actualDurationMs = await auditionAsset({
         id: n.id,
         category,
         key: "Dm",
         bpm: 120,
         audioFile,
-        playbackMode: "full",
+        playbackMode: isQuick && n.type !== "transition" ? "transition" : "full",
       });
 
       i++;
-      // Wait for actual file to finish, then advance (300ms gap between nodes)
-      const waitMs = actualDurationMs > 0 ? actualDurationMs + 300 : 1000;
+      // In quick mode, cap at 20s per node; in full mode play entire file
+      const maxMs = isQuick ? Math.min(actualDurationMs, 20500) : actualDurationMs;
+      const waitMs = maxMs > 0 ? maxMs + 300 : 1000;
       setTimeout(playNext, waitMs);
     }
     playNext();
@@ -430,6 +457,19 @@ export function Canvas({ level, projectId }: CanvasProps) {
               )}
             </button>
 
+            {/* Quick/Full toggle */}
+            <button
+              onClick={() => setSequenceQuickMode((q) => !q)}
+              className={`px-2 py-1.5 text-[10px] font-semibold rounded-lg border transition-colors backdrop-blur-sm shadow-lg ${
+                sequenceQuickMode
+                  ? "bg-[#0d0d1a]/90 text-canvas-muted border-canvas-accent hover:text-canvas-text"
+                  : "bg-amber-900/30 text-amber-400 border-amber-500/40"
+              }`}
+              title={sequenceQuickMode ? "Quick: ~20s preview per node" : "Full: play entire file per node"}
+            >
+              {sequenceQuickMode ? "Quick" : "Full"}
+            </button>
+
             <button
               onClick={toggleViewMode}
               className={`px-3 py-1.5 text-[11px] font-semibold rounded-lg border transition-colors backdrop-blur-sm shadow-lg ${
@@ -447,25 +487,44 @@ export function Canvas({ level, projectId }: CanvasProps) {
               Clean Up View
             </button>
           </div>
-          {sequenceNodeId && (
+          {sequencePlaying && sequenceNodeId && (
             <div className="mt-2 text-right">
-              <span className="px-2 py-1 text-[10px] font-mono bg-green-900/40 text-green-300 border border-green-500/30 rounded-md backdrop-blur-sm">
-                ▶ {nodes.find((n) => n.id === sequenceNodeId)?.data?.label as string ?? sequenceNodeId}
-              </span>
+              <div className="text-[8px] font-mono text-green-500/70 uppercase tracking-widest mb-0.5">Now Playing</div>
+              <div className="px-2.5 py-1.5 text-[11px] font-semibold bg-green-900/40 text-green-300 border border-green-500/30 rounded-md backdrop-blur-sm inline-flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                {nodes.find((n) => n.id === sequenceNodeId)?.data?.label as string ?? sequenceNodeId}
+              </div>
             </div>
           )}
-          {sequencePlaying && (
-            <div className="mt-2" style={{ width: 360 }}>
-              <PixelRunner
-                playing={sequencePlaying}
-                currentNodeId={sequenceNodeId}
-                currentNodeType={sequenceNodeType}
-                projectId={projectId}
-                totalNodes={sequenceTotalNodes}
-                currentNodeIndex={sequenceNodeIndex}
-                onRewind={handleSequenceRewind}
-                nodeLabels={sequenceOrderRef.current.map((n) => (n.data as Record<string, unknown>).label as string ?? n.id)}
-              />
+          {sequencePlaying && sequenceNodeId && (
+            <div className="mt-2 flex items-center gap-2">
+              <div className="flex items-center gap-1 px-2 py-1 rounded bg-[#0d0d1a]/90 border border-canvas-accent backdrop-blur-sm">
+                {sequenceOrderRef.current.map((_, idx) => {
+                  const isCurrent = idx === sequenceNodeIndex;
+                  const isPast = idx < sequenceNodeIndex;
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => handleSequenceRewind(idx)}
+                      className="group relative"
+                      title={sequenceOrderRef.current[idx] ? ((sequenceOrderRef.current[idx].data as Record<string, unknown>).label as string) : `Node ${idx + 1}`}
+                    >
+                      <div
+                        className="rounded-full transition-all"
+                        style={{
+                          width: isCurrent ? 8 : 5,
+                          height: isCurrent ? 8 : 5,
+                          background: isCurrent ? "#e94560" : isPast ? "#e9456066" : "#3a3a5c",
+                          boxShadow: isCurrent ? "0 0 6px #e94560" : "none",
+                        }}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+              <span className="text-[9px] text-canvas-muted font-mono">
+                {sequenceNodeIndex + 1}/{sequenceTotalNodes}
+              </span>
             </div>
           )}
         </Panel>
@@ -480,6 +539,66 @@ export function Canvas({ level, projectId }: CanvasProps) {
           maskColor="rgba(13, 13, 26, 0.85)"
           className="!bg-[#0d0d1a] !border-canvas-accent !rounded-lg"
         />
+        {/* Pixel sprite running along node paths */}
+        {sequencePlaying && sequenceNodeId && (() => {
+          const currentNode = nodes.find((n) => n.id === sequenceNodeId);
+          if (!currentNode) return null;
+          const screenPos = flowToScreenPosition({ x: currentNode.position.x, y: currentNode.position.y });
+          const wrapperRect = reactFlowWrapper.current?.getBoundingClientRect();
+          if (!wrapperRect) return null;
+          const relX = screenPos.x - wrapperRect.left;
+          const relY = screenPos.y - wrapperRect.top - 28; // above the node
+          const isJourney = projectId === "journey-2";
+          const spriteColors = isJourney
+            ? [["","","r","r","",""],["","r","r","r","r",""],["","","w","w","",""],["","w","w","w","",""],["","","w","","",""],["","w","","w","",""]]
+            : [["","p","p","p","",""],["","p","g","p","",""],["","","p","","",""],["","b","b","b","",""],["","b","b","b","",""],["","b","","b","",""]];
+          const colorMap: Record<string, string> = { r: "#e94560", w: "#e0d6c8", p: "#f0abfc", g: "#4ade80", b: "#93c5fd" };
+          return (
+            <div
+              className="absolute z-50 pointer-events-none transition-all duration-700 ease-in-out"
+              style={{ left: relX, top: relY }}
+            >
+              {/* Glow under sprite */}
+              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-5 h-1.5 rounded-full blur-sm"
+                style={{ background: isJourney ? "#e9456066" : "#c084fc66" }} />
+              {/* Sprite */}
+              <div style={{ imageRendering: "pixelated" as const }}>
+                {spriteColors.map((row, ri) => (
+                  <div key={ri} className="flex">
+                    {row.map((px, ci) => (
+                      <div key={ci} style={{ width: 3, height: 3, background: px ? colorMap[px] ?? "transparent" : "transparent" }} />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Undo toast for asset replacement */}
+        {undoToast && (
+          <Panel position="bottom-center">
+            <div className="flex items-center gap-3 px-4 py-2.5 bg-[#0d0d1a]/95 border border-canvas-accent rounded-lg backdrop-blur-sm shadow-2xl animate-in slide-in-from-bottom-2">
+              <span className="text-[11px] text-canvas-text">
+                <span className="text-canvas-highlight font-semibold">{undoToast.newAsset}</span>
+                {" → "}
+                <span className="text-canvas-muted">{undoToast.nodeName}</span>
+              </span>
+              <button
+                onClick={handleUndo}
+                className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-900/30 border border-amber-500/40 rounded hover:bg-amber-500/20 transition-colors"
+              >
+                Undo
+              </button>
+              <button
+                onClick={() => { setUndoToast(null); if (undoTimerRef.current) clearTimeout(undoTimerRef.current); }}
+                className="text-canvas-muted hover:text-canvas-text text-xs"
+              >
+                ✕
+              </button>
+            </div>
+          </Panel>
+        )}
       </ReactFlow>
     </div>
   );
