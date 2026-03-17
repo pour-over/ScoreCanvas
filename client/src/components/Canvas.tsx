@@ -487,46 +487,116 @@ export function Canvas({ level, projectId }: CanvasProps) {
               Clean Up View
             </button>
           </div>
-          {sequencePlaying && sequenceNodeId && (
-            <div className="mt-2 text-right">
-              <div className="text-[8px] font-mono text-green-500/70 uppercase tracking-widest mb-0.5">Now Playing</div>
-              <div className="px-2.5 py-1.5 text-[11px] font-semibold bg-green-900/40 text-green-300 border border-green-500/30 rounded-md backdrop-blur-sm inline-flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                {nodes.find((n) => n.id === sequenceNodeId)?.data?.label as string ?? sequenceNodeId}
+          {sequencePlaying && sequenceNodeId && (() => {
+            const order = sequenceOrderRef.current;
+            const currentNode = order[sequenceNodeIndex];
+            const nextNode = order[sequenceNodeIndex + 1];
+            const afterNext = order[sequenceNodeIndex + 2];
+            const currentLabel = (currentNode?.data as Record<string, unknown>)?.label as string ?? "...";
+            const currentType = currentNode?.type ?? "musicState";
+            const nextLabel = nextNode ? (nextNode.data as Record<string, unknown>).label as string : null;
+            const nextType = nextNode?.type ?? "musicState";
+            const afterLabel = afterNext ? (afterNext.data as Record<string, unknown>).label as string : null;
+            const afterType = afterNext?.type ?? "musicState";
+
+            // Icon per type
+            const typeIcon = (t: string) => {
+              if (t === "transition") return "→";
+              if (t === "stinger") return "◆";
+              if (t === "event") return "★";
+              if (t === "parameter") return "◎";
+              return "♪";
+            };
+            const typeColor = (t: string) => {
+              if (t === "transition") return "text-red-400";
+              if (t === "stinger") return "text-orange-400";
+              if (t === "event") return "text-cyan-400";
+              if (t === "parameter") return "text-purple-400";
+              return "text-green-300";
+            };
+
+            // Upcoming message
+            let upcomingMsg = "";
+            if (nextType === "transition") upcomingMsg = "Coming up to transition!";
+            else if (nextType === "event") upcomingMsg = "Event cue incoming!";
+            else if (nextType === "stinger") upcomingMsg = "Stinger hit next!";
+            else if (nextLabel) upcomingMsg = `Up next: ${nextLabel}`;
+
+            return (
+              <div className="mt-2 px-3 py-2 rounded-lg bg-[#0d0d1a]/95 border border-canvas-accent backdrop-blur-sm shadow-xl" style={{ minWidth: 280 }}>
+                {/* Now Playing header */}
+                <div className="text-[8px] font-mono text-green-500/70 uppercase tracking-widest mb-1">Now Playing</div>
+
+                {/* Current track */}
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
+                  <span className={`text-[12px] font-bold ${typeColor(currentType)}`}>
+                    {typeIcon(currentType)} {currentLabel}
+                  </span>
+                  <span className="text-[9px] text-canvas-muted font-mono ml-auto">
+                    {sequenceNodeIndex + 1}/{sequenceTotalNodes}
+                  </span>
+                </div>
+
+                {/* Upcoming message */}
+                {upcomingMsg && (
+                  <div className="text-[9px] text-amber-400/80 font-mono italic mb-1.5">
+                    {upcomingMsg}
+                  </div>
+                )}
+
+                {/* Sequence path: current → next → after */}
+                <div className="flex items-center gap-1 text-[9px] font-mono flex-wrap">
+                  <span className={`font-bold ${typeColor(currentType)}`}>{typeIcon(currentType)} {currentLabel}</span>
+                  {nextLabel && (
+                    <>
+                      <span className="text-canvas-muted mx-0.5">→</span>
+                      <span className={typeColor(nextType)}>
+                        {nextType === "stinger" ? "◆ " : nextType === "transition" ? "→ " : typeIcon(nextType) + " "}
+                        {nextLabel}
+                      </span>
+                    </>
+                  )}
+                  {afterLabel && (
+                    <>
+                      <span className="text-canvas-muted mx-0.5">→</span>
+                      <span className={`${typeColor(afterType)} opacity-60`}>
+                        {afterType === "stinger" ? "◆ " : afterType === "transition" ? "→ " : typeIcon(afterType) + " "}
+                        {afterLabel}
+                      </span>
+                    </>
+                  )}
+                </div>
+
+                {/* Rewind dots */}
+                <div className="flex items-center gap-1 mt-2 pt-1.5 border-t border-canvas-accent/30">
+                  {order.map((_, idx) => {
+                    const isCurrent = idx === sequenceNodeIndex;
+                    const isPast = idx < sequenceNodeIndex;
+                    const nType = order[idx]?.type ?? "musicState";
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => handleSequenceRewind(idx)}
+                        title={(order[idx]?.data as Record<string, unknown>)?.label as string ?? `Node ${idx + 1}`}
+                      >
+                        <div
+                          className="rounded-full transition-all"
+                          style={{
+                            width: isCurrent ? 8 : nType === "transition" ? 6 : 5,
+                            height: isCurrent ? 8 : nType === "transition" ? 3 : 5,
+                            borderRadius: nType === "transition" ? 2 : 999,
+                            background: isCurrent ? "#4ade80" : isPast ? "#4ade8066" : "#3a3a5c",
+                            boxShadow: isCurrent ? "0 0 6px #4ade80" : "none",
+                          }}
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          )}
-          {sequencePlaying && sequenceNodeId && (
-            <div className="mt-2 flex items-center gap-2">
-              <div className="flex items-center gap-1 px-2 py-1 rounded bg-[#0d0d1a]/90 border border-canvas-accent backdrop-blur-sm">
-                {sequenceOrderRef.current.map((_, idx) => {
-                  const isCurrent = idx === sequenceNodeIndex;
-                  const isPast = idx < sequenceNodeIndex;
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => handleSequenceRewind(idx)}
-                      className="group relative"
-                      title={sequenceOrderRef.current[idx] ? ((sequenceOrderRef.current[idx].data as Record<string, unknown>).label as string) : `Node ${idx + 1}`}
-                    >
-                      <div
-                        className="rounded-full transition-all"
-                        style={{
-                          width: isCurrent ? 8 : 5,
-                          height: isCurrent ? 8 : 5,
-                          background: isCurrent ? "#e94560" : isPast ? "#e9456066" : "#3a3a5c",
-                          boxShadow: isCurrent ? "0 0 6px #e94560" : "none",
-                        }}
-                      />
-                    </button>
-                  );
-                })}
-              </div>
-              <span className="text-[9px] text-canvas-muted font-mono">
-                {sequenceNodeIndex + 1}/{sequenceTotalNodes}
-              </span>
-            </div>
-          )}
+            );
+          })()}
         </Panel>
         <MiniMap
           nodeColor={(n) => {
@@ -539,7 +609,7 @@ export function Canvas({ level, projectId }: CanvasProps) {
           maskColor="rgba(13, 13, 26, 0.85)"
           className="!bg-[#0d0d1a] !border-canvas-accent !rounded-lg"
         />
-        {/* Pixel sprite running along node paths */}
+        {/* Pixel sprite running along node paths — big, flashy, animated */}
         {sequencePlaying && sequenceNodeId && (() => {
           const currentNode = nodes.find((n) => n.id === sequenceNodeId);
           if (!currentNode) return null;
@@ -547,30 +617,86 @@ export function Canvas({ level, projectId }: CanvasProps) {
           const wrapperRect = reactFlowWrapper.current?.getBoundingClientRect();
           if (!wrapperRect) return null;
           const relX = screenPos.x - wrapperRect.left;
-          const relY = screenPos.y - wrapperRect.top - 28; // above the node
+          const relY = screenPos.y - wrapperRect.top - 50;
           const isJourney = projectId === "journey-2";
-          const spriteColors = isJourney
-            ? [["","","r","r","",""],["","r","r","r","r",""],["","","w","w","",""],["","w","w","w","",""],["","","w","","",""],["","w","","w","",""]]
-            : [["","p","p","p","",""],["","p","g","p","",""],["","","p","","",""],["","b","b","b","",""],["","b","b","b","",""],["","b","","b","",""]];
-          const colorMap: Record<string, string> = { r: "#e94560", w: "#e0d6c8", p: "#f0abfc", g: "#4ade80", b: "#93c5fd" };
+          const px = 4; // bigger pixels
+          const nodeType = currentNode.type ?? "musicState";
+
+          // Alternating dance frames based on time
+          const t = Date.now();
+          const danceBeat = Math.floor(t / 400) % 4;
+          const bobY = Math.sin(t / 300) * 3;
+          const isEmoting = Math.floor(t / 3000) % 5 === 0; // emote every ~15s
+
+          // Journey: scarf figure, Bloodborne: cat in pajamas
+          const frames = isJourney ? [
+            // Normal run / dance frames
+            [["","","r","r","r","",""],["","r","r","r","r","r",""],["","","","w","","",""],["","","w","w","w","",""],["","","","w","","",""],["","","w","","w","",""],["","w","","","","w",""]],
+            [["","r","r","r","","",""],["r","r","r","r","r","",""],["","","w","w","","",""],["","w","w","w","","",""],["","","w","","","",""],["","","w","w","","",""],["","w","","","w","",""]],
+            // Dance!
+            [["","","","r","r","r",""],["","","r","r","r","r",""],["","","","w","","",""],["","","w","w","w","",""],["","","","w","","",""],["","w","","","","w",""],["w","","","","","","w"]],
+            // Emote — arms up
+            [["r","r","r","r","r","r","r"],["","","r","r","r","",""],["y","","","w","","","y"],["","y","w","w","w","y",""],["","","","w","","",""],["","","w","","w","",""],["","w","","","","w",""]],
+          ] : [
+            [["","","p","p","p","",""],["","","p","g","p","",""],["","","","p","","",""],["","","b","b","b","",""],["","","b","b","b","",""],["","","","b","","",""],["","","b","","b","",""]],
+            [["","p","p","p","","",""],["","p","g","p","","",""],["","","p","","","",""],["","b","b","b","","",""],["","b","b","b","","",""],["","","b","","","",""],["","","b","b","","",""]],
+            [["","","","p","p","p",""],["","","","p","g","p",""],["","","","","p","",""],["","","","b","b","b",""],["","","","b","b","b",""],["","","b","","","b",""],["","b","","","","","b"]],
+            [["c","","p","p","p","","c"],["","c","p","g","p","c",""],["","","","p","","",""],["","t","b","b","b","t",""],["","","b","b","b","",""],["","","","b","","",""],["","","b","","b","",""]],
+          ];
+          const frameIdx = isEmoting ? 3 : danceBeat % 3;
+          const sprite = frames[frameIdx];
+          const colorMap: Record<string, string> = {
+            r: "#e94560", w: "#e0d6c8", y: "#fbbf24",
+            p: "#f0abfc", g: "#4ade80", b: "#93c5fd", t: "#facc15", c: "#c084fc",
+          };
+
+          // Flash color based on node type
+          const glowColor = nodeType === "transition" ? "#e94560"
+            : nodeType === "event" ? "#22d3ee"
+            : nodeType === "parameter" ? "#a855f7"
+            : isJourney ? "#fbbf24" : "#c084fc";
+
           return (
             <div
               className="absolute z-50 pointer-events-none transition-all duration-700 ease-in-out"
-              style={{ left: relX, top: relY }}
+              style={{ left: relX, top: relY + bobY }}
             >
+              {/* Pulsing glow ring */}
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full animate-ping"
+                style={{ width: 20, height: 6, background: `${glowColor}33` }} />
               {/* Glow under sprite */}
-              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-5 h-1.5 rounded-full blur-sm"
-                style={{ background: isJourney ? "#e9456066" : "#c084fc66" }} />
+              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full blur-md"
+                style={{ width: 24, height: 8, background: `${glowColor}66` }} />
+              {/* Sprite label */}
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap text-[7px] font-mono font-bold"
+                style={{ color: glowColor, textShadow: `0 0 6px ${glowColor}` }}>
+                {isEmoting ? (isJourney ? "♪ VIBING ♪" : "♪ PURRING ♪") : ""}
+              </div>
               {/* Sprite */}
-              <div style={{ imageRendering: "pixelated" as const }}>
-                {spriteColors.map((row, ri) => (
+              <div style={{ imageRendering: "pixelated" as const, filter: `drop-shadow(0 0 4px ${glowColor}88)` }}>
+                {sprite.map((row, ri) => (
                   <div key={ri} className="flex">
-                    {row.map((px, ci) => (
-                      <div key={ci} style={{ width: 3, height: 3, background: px ? colorMap[px] ?? "transparent" : "transparent" }} />
+                    {row.map((pixel, ci) => (
+                      <div key={ci} style={{
+                        width: px, height: px,
+                        background: pixel ? colorMap[pixel] ?? "transparent" : "transparent",
+                      }} />
                     ))}
                   </div>
                 ))}
               </div>
+              {/* Sparkle particles when emoting */}
+              {isEmoting && [0, 1, 2, 3].map((i) => (
+                <div key={`sparkle-${i}`} className="absolute rounded-full animate-bounce"
+                  style={{
+                    width: 3, height: 3,
+                    left: 4 + i * 7 + Math.sin(t / 200 + i) * 4,
+                    top: -8 + Math.cos(t / 300 + i * 2) * 6,
+                    background: glowColor,
+                    opacity: 0.7,
+                    animationDelay: `${i * 0.15}s`,
+                  }} />
+              ))}
             </div>
           );
         })()}
