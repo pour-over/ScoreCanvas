@@ -87,6 +87,7 @@ export function PlayButton({
 
   return (
     <button
+      data-tour="node-play"
       onClick={handleClick}
       className={`${dim} rounded-full flex items-center justify-center transition-all duration-150 relative ${
         playing

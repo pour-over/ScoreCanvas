@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ReactFlowProvider } from "@xyflow/react";
 import { Canvas } from "./components/Canvas";
 import { Sidebar } from "./components/Sidebar";
@@ -6,6 +6,7 @@ import { TopBar } from "./components/TopBar";
 import { ProjectAssets } from "./components/ProjectAssets";
 import { ExportModal } from "./components/ExportModal";
 import { StatusReport } from "./components/StatusReport";
+import { GuidedTour, hasTourBeenSeen } from "./components/GuidedTour";
 import { ViewModeProvider } from "./context/ViewModeContext";
 import { projects } from "./data/projects";
 import "./App.css";
@@ -20,6 +21,15 @@ export default function App() {
   const [showProjectAssets, setShowProjectAssets] = useState(false);
   const [showExport, setShowExport] = useState(false);
   const [showStatusReport, setShowStatusReport] = useState(false);
+  const [showTour, setShowTour] = useState(false);
+
+  // Auto-show tour for first-time users (after a brief delay so DOM is ready)
+  useEffect(() => {
+    if (!hasTourBeenSeen()) {
+      const timer = setTimeout(() => setShowTour(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const handleSelectProject = (projectId: string) => {
     setSelectedProjectId(projectId);
@@ -39,6 +49,7 @@ export default function App() {
         onOpenProjectAssets={() => setShowProjectAssets(true)}
         onOpenExport={() => setShowExport(true)}
         onOpenStatusReport={() => setShowStatusReport(true)}
+        onStartTour={() => setShowTour(true)}
       />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar
@@ -64,6 +75,9 @@ export default function App() {
       )}
       {showStatusReport && (
         <StatusReport levels={currentProject.levels} onClose={() => setShowStatusReport(false)} />
+      )}
+      {showTour && (
+        <GuidedTour onClose={() => setShowTour(false)} />
       )}
     </div>
   );

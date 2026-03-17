@@ -28,7 +28,7 @@ export function Sidebar({ projects, selectedProjectId, onSelectProject, levels, 
   };
 
   return (
-    <aside className="w-60 bg-[#0d0d1a] border-r border-canvas-accent flex flex-col shrink-0 overflow-hidden">
+    <aside data-tour="sidebar" className="w-60 bg-[#0d0d1a] border-r border-canvas-accent flex flex-col shrink-0 overflow-hidden">
       {/* Project Switcher */}
       <div className="px-2 pt-2 pb-1">
         <div className="flex gap-1 bg-canvas-bg rounded-lg p-0.5">

@@ -470,7 +470,7 @@ export function Canvas({ level, projectId }: CanvasProps) {
 
   return (
     <PlayingNodeProvider value={sequenceNodeId}>
-    <div ref={reactFlowWrapper} className="flex-1 h-full">
+    <div ref={reactFlowWrapper} data-tour="canvas" className="flex-1 h-full">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -490,6 +490,7 @@ export function Canvas({ level, projectId }: CanvasProps) {
         <Panel position="top-right">
           <div className="flex gap-2 items-center">
             <button
+              data-tour="view-mode"
               onClick={toggleViewMode}
               className={`px-3 py-1.5 text-[11px] font-semibold rounded-lg border transition-colors backdrop-blur-sm shadow-lg ${
                 mode === "simple"
@@ -507,7 +508,7 @@ export function Canvas({ level, projectId }: CanvasProps) {
             </button>
 
             {/* Jump to node */}
-            <div className="relative">
+            <div data-tour="jump-node" className="relative">
               <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#0d0d1a]/90 border border-canvas-accent backdrop-blur-sm shadow-lg">
                 <span className="text-[10px] text-canvas-muted">⎆</span>
                 <input

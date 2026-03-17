@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import type { Node } from "@xyflow/react";
 
 // ─── Sprite definitions ──────────────────────────────────────────────────────
@@ -98,33 +98,34 @@ function MiniSprite({ progress, isJourney, playing }: { progress: number; isJour
 
   const sprites = isJourney ? JOURNEY_SPRITES : BLOODBORNE_SPRITES;
   const spriteData = frame % 2 === 0 ? sprites.run1 : sprites.run2;
-  const px = 2;
+  const px = 4; // Bigger pixels!
 
   if (!playing) return null;
 
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ opacity: 0.35 }}>
+    <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ opacity: 0.8 }}>
       {/* Ground line */}
-      <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: isJourney ? "#d4a76a33" : "#6b728033" }} />
+      <div className="absolute left-0 right-0 h-px" style={{ bottom: 6, background: isJourney ? "#d4a76a44" : "#6b728044" }} />
 
-      {/* Tiny background elements */}
-      {[15, 55, 95, 140, 185, 230, 270].map((x, i) => (
+      {/* Scenery elements */}
+      {[15, 75, 140, 210, 290, 380, 460, 540, 620, 700].map((x, i) => (
         <div key={i} className="absolute" style={{
-          left: x, bottom: 2,
-          width: i % 2 === 0 ? 3 : 1,
-          height: i % 2 === 0 ? 2 : 3,
-          background: isJourney ? "#d4a76a22" : "#6b728022",
-          borderRadius: i % 2 === 0 ? "1px 1px 0 0" : 0,
+          left: x, bottom: 8,
+          width: i % 2 === 0 ? 5 : 2,
+          height: i % 2 === 0 ? 4 : 6,
+          background: isJourney ? "#d4a76a25" : "#6b728025",
+          borderRadius: i % 2 === 0 ? "2px 2px 0 0" : 0,
         }} />
       ))}
 
-      {/* Character */}
+      {/* Character — centered vertically, bigger, with glow */}
       <div
         className="absolute transition-all duration-500 ease-out"
         style={{
           left: `${6 + progress * 85}%`,
-          bottom: 3,
+          bottom: 8,
           transform: "translateX(-50%)",
+          filter: `drop-shadow(0 0 6px ${isJourney ? "#e9456088" : "#c084fc88"})`,
         }}
       >
         <div style={{ imageRendering: "pixelated" as const }}>
@@ -165,6 +166,37 @@ export function TransportBar({
   const [minimized, setMinimized] = useState(false);
   const [spriteVisible, setSpriteVisible] = useState(true);
   const isJourney = projectId === "journey-2";
+
+  // ─── Draggable transport ──────────────────────────────────────────────────
+  const dragRef = useRef<HTMLDivElement>(null);
+  const [dragOffset, setDragOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const isDragging = useRef(false);
+  const dragStart = useRef<{ mx: number; my: number; ox: number; oy: number }>({ mx: 0, my: 0, ox: 0, oy: 0 });
+
+  const handleDragStart = useCallback((e: React.MouseEvent) => {
+    // Only drag from the header grip area
+    if ((e.target as HTMLElement).closest("button, input")) return;
+    isDragging.current = true;
+    dragStart.current = { mx: e.clientX, my: e.clientY, ox: dragOffset.x, oy: dragOffset.y };
+    e.preventDefault();
+  }, [dragOffset]);
+
+  useEffect(() => {
+    const handleMove = (e: MouseEvent) => {
+      if (!isDragging.current) return;
+      setDragOffset({
+        x: dragStart.current.ox + (e.clientX - dragStart.current.mx),
+        y: dragStart.current.oy + (e.clientY - dragStart.current.my),
+      });
+    };
+    const handleUp = () => { isDragging.current = false; };
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseup", handleUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseup", handleUp);
+    };
+  }, []);
 
   const currentNode = sequenceOrder[sequenceNodeIndex];
   const nextNode = sequenceOrder[sequenceNodeIndex + 1];
@@ -227,7 +259,13 @@ export function TransportBar({
   }
 
   return (
-    <div className="relative rounded-xl bg-[#0a0a18]/95 border border-canvas-accent/60 backdrop-blur-md shadow-2xl overflow-hidden" style={{ minWidth: 600, maxWidth: 820 }}>
+    <div
+      ref={dragRef}
+      data-tour="transport"
+      onMouseDown={handleDragStart}
+      className="relative rounded-xl bg-[#0a0a18]/95 border border-canvas-accent/60 backdrop-blur-md shadow-2xl overflow-hidden select-none"
+      style={{ minWidth: 600, maxWidth: 820, transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)`, cursor: isDragging.current ? "grabbing" : "grab" }}
+    >
       {/* Mini sprite scene — subtle, behind everything */}
       {spriteVisible && (
         <MiniSprite progress={progress} isJourney={isJourney} playing={sequencePlaying} />
@@ -374,6 +412,7 @@ export function TransportBar({
         <div className="flex items-center gap-1">
           {/* Transitions Only / Full Score toggle */}
           <button
+            data-tour="mode-toggle"
             onClick={onToggleQuickMode}
             className={`px-1.5 py-1 text-[9px] font-semibold rounded-md border transition-colors whitespace-nowrap ${
               sequenceQuickMode
@@ -401,6 +440,7 @@ export function TransportBar({
 
           {/* Stop All (panic) */}
           <button
+            data-tour="stop-all"
             onClick={onStopAll}
             className="px-2 py-1 text-[9px] font-bold rounded-md bg-red-950/40 text-red-400/80 border border-red-500/25 hover:bg-red-500/25 hover:text-red-300 transition-colors whitespace-nowrap"
             title="Stop all audio immediately"

@@ -8,6 +8,7 @@ interface TopBarProps {
   onOpenProjectAssets: () => void;
   onOpenExport: () => void;
   onOpenStatusReport: () => void;
+  onStartTour?: () => void;
 }
 
 const integrations = [
@@ -27,6 +28,7 @@ export function TopBar({
   onOpenProjectAssets,
   onOpenExport,
   onOpenStatusReport,
+  onStartTour,
 }: TopBarProps) {
   return (
     <header className="h-11 bg-[#0d0d1a] border-b border-canvas-accent flex items-center px-4 gap-4 shrink-0">
@@ -46,12 +48,14 @@ export function TopBar({
       <div className="w-px h-5 bg-canvas-accent" />
       <div className="flex items-center gap-2">
         <button
+          data-tour="project-assets"
           onClick={onOpenProjectAssets}
           className="px-2.5 py-1 text-[11px] font-semibold rounded bg-canvas-accent/60 text-canvas-text border border-canvas-accent hover:bg-canvas-accent transition-colors"
         >
           Project Assets
         </button>
         <button
+          data-tour="export"
           onClick={onOpenExport}
           className="px-2.5 py-1 text-[11px] font-semibold rounded bg-canvas-highlight/80 text-white border border-canvas-highlight hover:bg-canvas-highlight transition-colors"
         >
@@ -65,7 +69,7 @@ export function TopBar({
         </button>
       </div>
       <div className="flex-1" />
-      <div className="flex items-center gap-1.5">
+      <div data-tour="integrations" className="flex items-center gap-1.5">
         {integrations.map((tool) => (
           <button
             key={tool.abbr}
@@ -88,6 +92,18 @@ export function TopBar({
         <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
         <span className="text-[11px] text-canvas-muted">Live</span>
       </div>
+      {onStartTour && (
+        <>
+          <div className="w-px h-5 bg-canvas-accent" />
+          <button
+            onClick={onStartTour}
+            className="w-6 h-6 flex items-center justify-center rounded-full border border-canvas-accent text-canvas-muted hover:text-canvas-highlight hover:border-canvas-highlight/50 transition-colors text-xs font-bold"
+            title="Take a guided tour"
+          >
+            ?
+          </button>
+        </>
+      )}
     </header>
   );
 }
