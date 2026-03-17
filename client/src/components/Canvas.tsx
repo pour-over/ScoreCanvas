@@ -200,8 +200,11 @@ export function Canvas({ level, projectId }: CanvasProps) {
   const [sequenceNodeIndex, setSequenceNodeIndex] = useState(0);
   const [sequenceTotalNodes, setSequenceTotalNodes] = useState(0);
   const [sequenceQuickMode, setSequenceQuickMode] = useState(false);
+  const sequenceQuickModeRef = useRef(false);
   const [jumpInput, setJumpInput] = useState("");
   const [jumpSuggestions, setJumpSuggestions] = useState<Array<{ idx: number; label: string; type: string }>>([]);
+  // Keep ref in sync with state so recursive playNext always reads latest
+  useEffect(() => { sequenceQuickModeRef.current = sequenceQuickMode; }, [sequenceQuickMode]);
   const sequenceAbort = useRef(false);
   const sequenceOrderRef = useRef<Node[]>([]);
 
@@ -427,7 +430,7 @@ export function Canvas({ level, projectId }: CanvasProps) {
       setSequenceNodeIndex(i);
 
       // Quick mode: transition preview (first/last 10s = ~20s), Full mode: entire file
-      const isQuick = sequenceQuickMode;
+      const isQuick = sequenceQuickModeRef.current;
       const actualDurationMs = await auditionAsset({
         id: n.id,
         category,
