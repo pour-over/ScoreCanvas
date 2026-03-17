@@ -54,7 +54,7 @@ const whisperingSandsEdges: Edge[] = [
 // ─── LEVEL 2: THE BABBLING BROOK OF DEVASTATION ─────────────────────────────
 
 const babblingBrookAssets: MusicAsset[] = [
-  { id: "a-bb-01", filename: "mus_brook_waters_of_regret_intro", category: "intro", duration: "0:24", bpm: 96, key: "F#m", stems: ["water_drops_ominous", "flute_spa_from_hell", "strings_tension_soothing"], audioFile: "journey2/mus_journey2_main_theme_intro.mp3" },
+  { id: "a-bb-01", filename: "mus_brook_waters_of_regret_intro", category: "intro", duration: "0:24", bpm: 96, key: "F#m", stems: ["water_drops_ominous", "flute_spa_from_hell", "strings_tension_soothing"], audioFile: "journey2/mus_brook_carnage_creek_ambient.mp3" },
   { id: "a-bb-02", filename: "mus_brook_genocide_waltz_loop", category: "loop", duration: "1:48", bpm: 96, key: "F#m", stems: ["harp_babbling", "oboe_mournful_joy", "bass_gentle_menace", "perc_river_stones"], audioFile: "journey2/mus_brook_peaceful_massacre_explore.mp3" },
   { id: "a-bb-03", filename: "mus_brook_whispered_threats_stealth", category: "loop", duration: "1:48", bpm: 96, key: "F#m", stems: ["synth_underwater_dread", "perc_drip_tick", "bass_sub_current"], audioFile: "journey2/mus_brook_carnage_creek_ambient.mp3" },
   { id: "a-bb-04", filename: "mus_brook_tranquil_fury_combat_lo", category: "loop", duration: "0:56", bpm: 144, key: "F#m", stems: ["perc_waterfall_slam", "brass_rapids_rage", "strings_undertow", "synth_splash_aggro"], audioFile: "journey2/mus_brook_destruction_lullaby_combat.mp3" },
@@ -106,7 +106,7 @@ const babblingBrookEdges: Edge[] = [
 // ─── LEVEL 3: THE TRANQUIL GARDENS OF UNSPEAKABLE HORROR ────────────────────
 
 const tranquilGardensAssets: MusicAsset[] = [
-  { id: "a-tg-01", filename: "mus_garden_petal_of_dread_intro", category: "intro", duration: "0:26", bpm: 82, key: "Bbm", stems: ["music_box_sinister", "strings_thorny", "wind_chime_threatening"], audioFile: "journey2/mus_journey2_main_theme_intro.mp3" },
+  { id: "a-tg-01", filename: "mus_garden_petal_of_dread_intro", category: "intro", duration: "0:26", bpm: 82, key: "Bbm", stems: ["music_box_sinister", "strings_thorny", "wind_chime_threatening"], audioFile: "journey2/mus_garden_zen_annihilation_ambient.mp3" },
   { id: "a-tg-02", filename: "mus_garden_existential_dread_loop", category: "loop", duration: "2:16", bpm: 82, key: "Bbm", stems: ["harp_wilting", "flute_photosynthesis", "bass_root_system", "perc_falling_petals"], audioFile: "journey2/mus_garden_horror_blossom_explore.mp3" },
   { id: "a-tg-03", filename: "mus_garden_violent_meditation_puzzle", category: "loop", duration: "1:28", bpm: 82, key: "Bbm", stems: ["music_box_contemplative_rage", "synth_zen_fury", "bass_deep_breath"], audioFile: "journey2/mus_garden_zen_annihilation_ambient.mp3" },
   { id: "a-tg-04", filename: "mus_garden_aggressive_yoga_combat_lo", category: "loop", duration: "1:04", bpm: 138, key: "Bbm", stems: ["perc_compost_slam", "brass_thorns", "strings_vine_whip", "synth_chlorophyll_rage"], audioFile: "journey2/mus_garden_petal_destruction_combat.mp3" },
@@ -156,7 +156,7 @@ const tranquilGardensEdges: Edge[] = [
 // ─── LEVEL 4: CLOUD NINE THOUSAND WAYS TO DIE ──────────────────────────────
 
 const cloudNineAssets: MusicAsset[] = [
-  { id: "a-cn-01", filename: "mus_cloud_heavens_waiting_room_intro", category: "intro", duration: "0:30", bpm: 92, key: "Em", stems: ["choir_angelic_threat", "harp_cumulus", "synth_celestial_menace"], audioFile: "journey2/mus_journey2_main_theme_intro.mp3" },
+  { id: "a-cn-01", filename: "mus_cloud_heavens_waiting_room_intro", category: "intro", duration: "0:30", bpm: 92, key: "Em", stems: ["choir_angelic_threat", "harp_cumulus", "synth_celestial_menace"], audioFile: "journey2/mus_cloud_fluffy_death_explore.mp3" },
   { id: "a-cn-02", filename: "mus_cloud_chainsaw_lullaby_loop", category: "loop", duration: "2:04", bpm: 92, key: "Em", stems: ["harp_cirrus_drift", "flute_stratosphere", "bass_cloud_density", "perc_raindrop_march"], audioFile: "journey2/mus_cloud_chainsaw_lullaby_combat.mp3" },
   { id: "a-cn-03", filename: "mus_cloud_nimbus_of_regret_loop", category: "loop", duration: "2:04", bpm: 92, key: "Em", stems: ["synth_fog_of_war", "strings_altitude_sickness", "bass_turbulence"], audioFile: "journey2/mus_cloud_fluffy_death_explore.mp3" },
   { id: "a-cn-04", filename: "mus_cloud_freefall_of_friendship_combat_lo", category: "loop", duration: "1:00", bpm: 148, key: "Em", stems: ["perc_thunder_tribal", "brass_lightning_bolt", "strings_terminal_velocity", "synth_wind_shear"], audioFile: "journey2/mus_cloud_chainsaw_lullaby_combat.mp3" },
