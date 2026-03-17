@@ -6,6 +6,8 @@ interface PlayButtonProps {
   category: AssetCategory;
   musicalKey?: string;
   bpm?: number;
+  audioFile?: string;
+  playbackMode?: "full" | "transition";
   preRoll?: { category: AssetCategory; durationMs: number };
   postRoll?: { category: AssetCategory; durationMs: number };
   size?: "sm" | "md";
@@ -16,6 +18,8 @@ export function PlayButton({
   category,
   musicalKey = "Am",
   bpm = 120,
+  audioFile,
+  playbackMode,
   preRoll,
   postRoll,
   size = "sm",
@@ -36,7 +40,7 @@ export function PlayButton({
   }, [playing, nodeId]);
 
   const handleClick = useCallback(
-    (e: React.MouseEvent) => {
+    async (e: React.MouseEvent) => {
       e.stopPropagation();
 
       if (playing) {
@@ -50,14 +54,14 @@ export function PlayButton({
 
       if (preRoll) {
         setPhase("pre");
-        auditionAsset({ id: `${nodeId}-pre`, category: preRoll.category, key: musicalKey, bpm });
-        setTimeout(() => {
+        await auditionAsset({ id: `${nodeId}-pre`, category: preRoll.category, key: musicalKey, bpm });
+        setTimeout(async () => {
           setPhase("main");
-          auditionAsset({ id: nodeId, category, key: musicalKey, bpm });
+          await auditionAsset({ id: nodeId, category, key: musicalKey, bpm, audioFile, playbackMode });
           if (postRoll) {
-            setTimeout(() => {
+            setTimeout(async () => {
               setPhase("post");
-              auditionAsset({ id: `${nodeId}-post`, category: postRoll.category, key: musicalKey, bpm });
+              await auditionAsset({ id: `${nodeId}-post`, category: postRoll.category, key: musicalKey, bpm });
               setTimeout(() => { setPlaying(false); setPhase("idle"); }, postRoll.durationMs);
             }, 1800);
           } else {
@@ -66,20 +70,14 @@ export function PlayButton({
         }, preRoll.durationMs);
       } else {
         setPhase("main");
-        const stillPlaying = auditionAsset({ id: nodeId, category, key: musicalKey, bpm });
+        const stillPlaying = await auditionAsset({ id: nodeId, category, key: musicalKey, bpm, audioFile, playbackMode });
         if (!stillPlaying) {
           setPlaying(false);
           setPhase("idle");
-        } else {
-          const durations: Record<AssetCategory, number> = {
-            intro: 3200, loop: ((60 / bpm) * 8 + 0.5) * 1000, ending: 4200,
-            transition: 1700, stinger: 1000, layer: 5200, ambient: 5200,
-          };
-          setTimeout(() => { setPlaying(false); setPhase("idle"); }, durations[category]);
         }
       }
     },
-    [playing, nodeId, category, musicalKey, bpm, preRoll, postRoll],
+    [playing, nodeId, category, musicalKey, bpm, audioFile, playbackMode, preRoll, postRoll],
   );
 
   const dim = size === "sm" ? "w-6 h-6" : "w-7 h-7";

@@ -30,10 +30,10 @@ export function ProjectAssets({ levels, projectName, onClose }: ProjectAssetsPro
 
   const categories = ["all", "intro", "loop", "transition", "stinger", "ending", "layer", "ambient"];
 
-  const handlePlay = (asset: MusicAsset) => {
-    const started = auditionAsset({ id: asset.id, category: asset.category as AssetCategory, key: asset.key, bpm: asset.bpm });
+  const handlePlay = async (asset: MusicAsset) => {
+    const started = await auditionAsset({ id: asset.id, category: asset.category as AssetCategory, key: asset.key, bpm: asset.bpm, audioFile: asset.audioFile });
     setPlayingId(started ? asset.id : null);
-    if (started) {
+    if (started && !asset.audioFile) {
       const durations: Record<string, number> = {
         intro: 3200, loop: ((60 / (asset.bpm || 120)) * 8 + 0.5) * 1000,
         ending: 4200, transition: 1700, stinger: 1000, layer: 5200, ambient: 5200,

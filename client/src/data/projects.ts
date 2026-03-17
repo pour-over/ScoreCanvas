@@ -10,6 +10,7 @@ export interface MusicAsset {
   bpm: number;
   key: string;
   stems: string[];
+  audioFile?: string; // path relative to /audio/ e.g. "journey2/mus_sands_explore.mp3"
 }
 
 export interface GameLevel {

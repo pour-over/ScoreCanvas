@@ -1,6 +1,7 @@
 import { useState, type DragEvent } from "react";
 import type { MusicAsset } from "../data/projects";
 import { auditionAsset, stopAudition, type AssetCategory } from "../audio/synth";
+import { StemEditor } from "./StemEditor";
 
 interface AssetBrowserProps {
   assets: MusicAsset[];
@@ -15,6 +16,8 @@ const categoryColors: Record<string, string> = {
 
 export function AssetBrowser({ assets }: AssetBrowserProps) {
   const [playingId, setPlayingId] = useState<string | null>(null);
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const [expandedEditorId, setExpandedEditorId] = useState<string | null>(null);
 
   const grouped = assets.reduce<Record<string, MusicAsset[]>>((acc, a) => {
     (acc[a.category] ??= []).push(a);
@@ -24,16 +27,16 @@ export function AssetBrowser({ assets }: AssetBrowserProps) {
   const order = ["intro", "loop", "transition", "stinger", "ending", "layer", "ambient"];
   const sorted = order.filter((c) => grouped[c]);
 
-  const handlePlay = (asset: MusicAsset) => {
-    const started = auditionAsset({
+  const handlePlay = async (asset: MusicAsset) => {
+    const started = await auditionAsset({
       id: asset.id,
       category: asset.category as AssetCategory,
       key: asset.key,
       bpm: asset.bpm,
+      audioFile: asset.audioFile,
     });
     setPlayingId(started ? asset.id : null);
-    if (started) {
-      // Auto-clear playing state
+    if (started && !asset.audioFile) {
       const durations: Record<string, number> = {
         intro: 3200, loop: ((60 / (asset.bpm || 120)) * 8 + 0.5) * 1000,
         ending: 4200, transition: 1700, stinger: 1000, layer: 5200, ambient: 5200,
@@ -50,6 +53,10 @@ export function AssetBrowser({ assets }: AssetBrowserProps) {
   const onDragStart = (e: DragEvent, asset: MusicAsset) => {
     e.dataTransfer.setData("application/scorecanvas-asset", JSON.stringify(asset));
     e.dataTransfer.effectAllowed = "copy";
+  };
+
+  const toggleSelect = (asset: MusicAsset) => {
+    setSelectedAssetId((prev) => prev === asset.id ? null : asset.id);
   };
 
   return (
@@ -78,40 +85,68 @@ export function AssetBrowser({ assets }: AssetBrowserProps) {
           </div>
           {grouped[cat].map((asset) => {
             const isActive = playingId === asset.id;
+            const isSelected = selectedAssetId === asset.id;
             return (
-              <div
-                key={asset.id}
-                className={`group flex items-center gap-1 px-1.5 py-1 rounded cursor-grab active:cursor-grabbing transition-colors ${
-                  isActive ? "bg-canvas-highlight/15" : "hover:bg-canvas-accent/40"
-                }`}
-                draggable
-                onDragStart={(e) => onDragStart(e, asset)}
-              >
-                <button
-                  onClick={() => isActive ? handleStop() : handlePlay(asset)}
-                  className={`w-5 h-5 rounded flex items-center justify-center shrink-0 transition-colors ${
-                    isActive ? "bg-canvas-highlight text-white" : "bg-canvas-bg text-canvas-muted hover:text-canvas-text"
+              <div key={asset.id}>
+                <div
+                  className={`group flex items-center gap-1 px-1.5 py-1 rounded cursor-grab active:cursor-grabbing transition-colors ${
+                    isSelected ? "bg-canvas-highlight/10 ring-1 ring-canvas-highlight/30" : isActive ? "bg-canvas-highlight/15" : "hover:bg-canvas-accent/40"
                   }`}
+                  draggable
+                  onDragStart={(e) => onDragStart(e, asset)}
+                  onClick={() => toggleSelect(asset)}
                 >
-                  {isActive ? (
-                    <svg width="8" height="8" viewBox="0 0 8 8"><rect x="1" y="1" width="2.5" height="6" fill="currentColor"/><rect x="4.5" y="1" width="2.5" height="6" fill="currentColor"/></svg>
-                  ) : (
-                    <svg width="8" height="8" viewBox="0 0 8 8"><polygon points="1,0 8,4 1,8" fill="currentColor"/></svg>
-                  )}
-                </button>
-                <div className="min-w-0 flex-1">
-                  <div className="text-[10px] font-mono text-canvas-text truncate">{asset.filename}</div>
-                  <div className="flex items-center gap-2 text-[9px] text-canvas-muted">
-                    <span>{asset.duration}</span>
-                    {asset.bpm > 0 && <span>{asset.bpm} BPM</span>}
-                    {asset.key !== "-" && <span>{asset.key}</span>}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); isActive ? handleStop() : handlePlay(asset); }}
+                    className={`w-5 h-5 rounded flex items-center justify-center shrink-0 transition-colors ${
+                      isActive ? "bg-canvas-highlight text-white" : "bg-canvas-bg text-canvas-muted hover:text-canvas-text"
+                    }`}
+                  >
+                    {isActive ? (
+                      <svg width="8" height="8" viewBox="0 0 8 8"><rect x="1" y="1" width="2.5" height="6" fill="currentColor"/><rect x="4.5" y="1" width="2.5" height="6" fill="currentColor"/></svg>
+                    ) : (
+                      <svg width="8" height="8" viewBox="0 0 8 8"><polygon points="1,0 8,4 1,8" fill="currentColor"/></svg>
+                    )}
+                  </button>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[10px] font-mono text-canvas-text truncate flex items-center gap-1">
+                      {asset.filename}
+                      {asset.audioFile && <span className="text-[7px] text-green-400/70" title="Has audio file">♫</span>}
+                    </div>
+                    <div className="flex items-center gap-2 text-[9px] text-canvas-muted">
+                      <span>{asset.duration}</span>
+                      {asset.bpm > 0 && <span>{asset.bpm} BPM</span>}
+                      {asset.key !== "-" && <span>{asset.key}</span>}
+                    </div>
                   </div>
                 </div>
+                {/* Inline stem editor when selected */}
+                {isSelected && asset.stems.length > 0 && (
+                  <StemEditor
+                    asset={asset}
+                    expanded={expandedEditorId === asset.id}
+                    onExpand={() => setExpandedEditorId(asset.id)}
+                    onCollapse={() => setExpandedEditorId(null)}
+                  />
+                )}
               </div>
             );
           })}
         </div>
       ))}
+      {/* Full-screen expanded editor portal */}
+      {expandedEditorId && (() => {
+        const asset = assets.find((a) => a.id === expandedEditorId);
+        if (!asset) return null;
+        return (
+          <StemEditor
+            asset={asset}
+            expanded={true}
+            onExpand={() => {}}
+            onCollapse={() => setExpandedEditorId(null)}
+          />
+        );
+      })()}
     </div>
   );
 }

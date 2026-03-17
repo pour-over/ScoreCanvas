@@ -1,7 +1,7 @@
 /**
- * Web Audio synth for auditioning music assets.
- * Generates soft, filtered tones that convey the *character* of each asset
- * category without being annoying on laptop speakers.
+ * Web Audio engine for Score Canvas.
+ * Plays real MP3 files when available, falls back to synth generation.
+ * Supports volume control and transition-mode (first/last 5s with fades).
  */
 
 // ─── Note frequency map ─────────────────────────────────────────────────────
@@ -17,9 +17,8 @@ const NOTE_FREQ: Record<string, number> = {
 };
 
 function parseRoot(key: string): number {
-  // Handle keys like "Dm", "F#m", "Bbm", "Am", "A"
   const match = key.match(/^([A-G][#b]?)/);
-  if (!match) return 261.63; // default C4
+  if (!match) return 261.63;
   return NOTE_FREQ[match[1]] ?? 261.63;
 }
 
@@ -33,14 +32,20 @@ let ctx: AudioContext | null = null;
 let masterGain: GainNode | null = null;
 let activeNodes: OscillatorNode[] = [];
 let activeTimeouts: number[] = [];
+let activeSources: AudioBufferSourceNode[] = [];
+let activeFileGains: GainNode[] = [];
 let isPlaying = false;
 let currentAssetId: string | null = null;
+let volumeLevel = 0.6; // default 60%
+
+// Audio buffer cache to avoid re-fetching
+const bufferCache = new Map<string, AudioBuffer>();
 
 function getCtx(): AudioContext {
   if (!ctx) {
     ctx = new AudioContext();
     masterGain = ctx.createGain();
-    masterGain.gain.value = 0.25;
+    masterGain.gain.value = volumeLevel;
     masterGain.connect(ctx.destination);
   }
   if (ctx.state === "suspended") ctx.resume();
@@ -50,6 +55,108 @@ function getCtx(): AudioContext {
 function getMaster(): GainNode {
   getCtx();
   return masterGain!;
+}
+
+// ─── Volume control ─────────────────────────────────────────────────────────
+
+export function setVolume(v: number) {
+  volumeLevel = Math.max(0, Math.min(1, v));
+  if (masterGain) {
+    masterGain.gain.value = volumeLevel;
+  }
+}
+
+export function getVolume(): number {
+  return volumeLevel;
+}
+
+// ─── MP3 file playback ──────────────────────────────────────────────────────
+
+async function loadAudioBuffer(url: string): Promise<AudioBuffer | null> {
+  if (bufferCache.has(url)) return bufferCache.get(url)!;
+  try {
+    const ac = getCtx();
+    const resp = await fetch(url);
+    if (!resp.ok) return null;
+    const arrayBuf = await resp.arrayBuffer();
+    const audioBuf = await ac.decodeAudioData(arrayBuf);
+    bufferCache.set(url, audioBuf);
+    return audioBuf;
+  } catch {
+    return null;
+  }
+}
+
+interface FilePlaybackOptions {
+  /** "full" plays entire file; "transition" plays first 5s + last 5s with fades */
+  mode?: "full" | "transition";
+}
+
+async function playAudioFile(
+  audioFile: string,
+  opts: FilePlaybackOptions = {},
+): Promise<number | null> {
+  const url = `/audio/${audioFile}`;
+  const buffer = await loadAudioBuffer(url);
+  if (!buffer) return null;
+
+  const ac = getCtx();
+  const master = getMaster();
+  const mode = opts.mode ?? "full";
+  const now = ac.currentTime;
+  const fadeDur = 1.5;
+
+  const source = ac.createBufferSource();
+  source.buffer = buffer;
+  const fileGain = ac.createGain();
+  source.connect(fileGain);
+  fileGain.connect(master);
+
+  activeSources.push(source);
+  activeFileGains.push(fileGain);
+
+  if (mode === "transition" && buffer.duration > 12) {
+    // Play first 5s (fade in 1s, fade out last 1.5s), then last 5s (fade in 1.5s, fade out last 1s)
+    const firstDur = 5;
+    const lastDur = 5;
+    const gapDur = 0.3;
+
+    // First segment
+    fileGain.gain.setValueAtTime(0, now);
+    fileGain.gain.linearRampToValueAtTime(1, now + 0.5);
+    fileGain.gain.setValueAtTime(1, now + firstDur - fadeDur);
+    fileGain.gain.linearRampToValueAtTime(0, now + firstDur);
+    source.start(now, 0, firstDur);
+
+    // Second segment (last 5 seconds) — need a separate source
+    const source2 = ac.createBufferSource();
+    source2.buffer = buffer;
+    const fileGain2 = ac.createGain();
+    source2.connect(fileGain2);
+    fileGain2.connect(master);
+    activeSources.push(source2);
+    activeFileGains.push(fileGain2);
+
+    const seg2Start = now + firstDur + gapDur;
+    const offset2 = Math.max(0, buffer.duration - lastDur);
+    fileGain2.gain.setValueAtTime(0, seg2Start);
+    fileGain2.gain.linearRampToValueAtTime(1, seg2Start + fadeDur);
+    fileGain2.gain.setValueAtTime(1, seg2Start + lastDur - 1);
+    fileGain2.gain.linearRampToValueAtTime(0, seg2Start + lastDur);
+    source2.start(seg2Start, offset2, lastDur);
+
+    return (firstDur + gapDur + lastDur) * 1000;
+  } else {
+    // Full playback with gentle fade in/out
+    fileGain.gain.setValueAtTime(0, now);
+    fileGain.gain.linearRampToValueAtTime(1, now + Math.min(0.3, buffer.duration * 0.1));
+    if (buffer.duration > 1) {
+      fileGain.gain.setValueAtTime(1, now + buffer.duration - Math.min(fadeDur, buffer.duration * 0.2));
+      fileGain.gain.linearRampToValueAtTime(0, now + buffer.duration);
+    }
+    source.start(now);
+    return buffer.duration * 1000;
+  }
 }
 
 // ─── Soft filtered oscillator builder ───────────────────────────────────────
@@ -88,12 +195,10 @@ function playIntro(ac: AudioContext, root: number, _bpm: number) {
   const dur = 3.0;
   const now = ac.currentTime;
 
-  // Slow pad swell: root + fifth, triangle wave, very filtered
   const v1 = createVoice(ac, octaveDown(root), "triangle", 600, 0, dest);
   const v2 = createVoice(ac, octaveDown(perfectFifth(root)), "triangle", 500, 0, dest);
   const v3 = createVoice(ac, octaveDown(minorThird(root)), "sine", 400, 0, dest);
 
-  // Swell in
   [v1, v2, v3].forEach((v, i) => {
     v.gain.gain.setValueAtTime(0, now);
     v.gain.gain.linearRampToValueAtTime(0.15 - i * 0.03, now + dur * 0.6);
@@ -111,9 +216,7 @@ function playLoop(ac: AudioContext, root: number, bpm: number) {
   const now = ac.currentTime;
   const beatDur = 60 / bpm;
   const totalBeats = 8;
-  const dur = beatDur * totalBeats;
 
-  // Rhythmic arpeggio: root, minor third, fifth — soft triangle pulses
   const notes = [octaveDown(root), octaveDown(minorThird(root)), octaveDown(perfectFifth(root)), octaveDown(root) * 2];
 
   for (let beat = 0; beat < totalBeats; beat++) {
@@ -131,8 +234,8 @@ function playLoop(ac: AudioContext, root: number, bpm: number) {
     activeNodes.push(v.osc);
   }
 
-  // Sustain pad underneath
   const pad = createVoice(ac, octaveDown(root), "sine", 350, 0, dest);
+  const dur = beatDur * totalBeats;
   pad.gain.gain.setValueAtTime(0, now);
   pad.gain.gain.linearRampToValueAtTime(0.06, now + 0.3);
   pad.gain.gain.setValueAtTime(0.06, now + dur - 0.5);
@@ -147,7 +250,6 @@ function playTransition(ac: AudioContext, root: number, _bpm: number) {
   const now = ac.currentTime;
   const dur = 1.5;
 
-  // Quick sweep: sine with rising filter
   const v = createVoice(ac, octaveDown(root), "sine", 200, 0, dest);
   v.gain.gain.setValueAtTime(0, now);
   v.gain.gain.linearRampToValueAtTime(0.15, now + 0.05);
@@ -159,7 +261,6 @@ function playTransition(ac: AudioContext, root: number, _bpm: number) {
   v.osc.stop(now + dur);
   activeNodes.push(v.osc);
 
-  // Second voice — fifth, delayed
   const v2 = createVoice(ac, octaveDown(perfectFifth(root)), "triangle", 300, 0, dest);
   v2.gain.gain.setValueAtTime(0, now + 0.1);
   v2.gain.gain.linearRampToValueAtTime(0.1, now + 0.15);
@@ -174,7 +275,6 @@ function playStinger(ac: AudioContext, root: number, _bpm: number) {
   const now = ac.currentTime;
   const dur = 0.8;
 
-  // Punchy hit: fast attack, immediate decay
   const v1 = createVoice(ac, root, "triangle", 1200, 0, dest);
   v1.gain.gain.setValueAtTime(0, now);
   v1.gain.gain.linearRampToValueAtTime(0.2, now + 0.01);
@@ -185,7 +285,6 @@ function playStinger(ac: AudioContext, root: number, _bpm: number) {
   v1.osc.stop(now + dur);
   activeNodes.push(v1.osc);
 
-  // Octave above for brightness
   const v2 = createVoice(ac, root * 2, "sine", 1000, 0, dest);
   v2.gain.gain.setValueAtTime(0, now);
   v2.gain.gain.linearRampToValueAtTime(0.1, now + 0.01);
@@ -200,8 +299,7 @@ function playEnding(ac: AudioContext, root: number, _bpm: number) {
   const now = ac.currentTime;
   const dur = 4.0;
 
-  // Resolving chord: root + third + fifth, slow fade
-  const freqs = [octaveDown(root), octaveDown(minorThird(root)) * 1.0595, octaveDown(perfectFifth(root))]; // major third for resolution
+  const freqs = [octaveDown(root), octaveDown(minorThird(root)) * 1.0595, octaveDown(perfectFifth(root))];
   freqs.forEach((f, i) => {
     const v = createVoice(ac, f, "triangle", 500, 0, dest);
     v.gain.gain.setValueAtTime(0, now);
@@ -219,14 +317,12 @@ function playAmbient(ac: AudioContext, root: number, _bpm: number) {
   const now = ac.currentTime;
   const dur = 5.0;
 
-  // Deep drone: very low, very filtered
   const droneFreq = octaveDown(octaveDown(root));
   const v = createVoice(ac, droneFreq, "triangle", 250, 0, dest);
   v.gain.gain.setValueAtTime(0, now);
   v.gain.gain.linearRampToValueAtTime(0.08, now + 1.5);
   v.gain.gain.setValueAtTime(0.08, now + dur - 2);
   v.gain.gain.linearRampToValueAtTime(0, now + dur);
-  // Slow filter movement
   v.filter.frequency.setValueAtTime(200, now);
   v.filter.frequency.linearRampToValueAtTime(400, now + dur * 0.5);
   v.filter.frequency.linearRampToValueAtTime(200, now + dur);
@@ -234,7 +330,6 @@ function playAmbient(ac: AudioContext, root: number, _bpm: number) {
   v.osc.stop(now + dur);
   activeNodes.push(v.osc);
 
-  // Subtle high shimmer
   const v2 = createVoice(ac, perfectFifth(root), "sine", 300, 0, dest);
   v2.gain.gain.setValueAtTime(0, now + 0.5);
   v2.gain.gain.linearRampToValueAtTime(0.03, now + 2);
@@ -253,6 +348,9 @@ export interface AuditionParams {
   category: AssetCategory;
   key: string;
   bpm: number;
+  audioFile?: string;
+  /** "full" plays entire file; "transition" plays first/last 5s with fades */
+  playbackMode?: "full" | "transition";
 }
 
 export function stopAudition() {
@@ -260,13 +358,18 @@ export function stopAudition() {
     try { osc.stop(); } catch { /* already stopped */ }
   });
   activeNodes = [];
+  activeSources.forEach((src) => {
+    try { src.stop(); } catch { /* already stopped */ }
+  });
+  activeSources = [];
+  activeFileGains = [];
   activeTimeouts.forEach((t) => clearTimeout(t));
   activeTimeouts = [];
   isPlaying = false;
   currentAssetId = null;
 }
 
-export function auditionAsset(params: AuditionParams): boolean {
+export async function auditionAsset(params: AuditionParams): Promise<boolean> {
   const ac = getCtx();
 
   // Toggle off if same asset
@@ -278,6 +381,26 @@ export function auditionAsset(params: AuditionParams): boolean {
   // Stop previous
   stopAudition();
 
+  isPlaying = true;
+  currentAssetId = params.id;
+
+  // Try playing real audio file first
+  if (params.audioFile) {
+    const durationMs = await playAudioFile(params.audioFile, {
+      mode: params.playbackMode ?? "full",
+    });
+    if (durationMs !== null) {
+      const timeout = window.setTimeout(() => {
+        isPlaying = false;
+        currentAssetId = null;
+      }, durationMs + 200);
+      activeTimeouts.push(timeout);
+      return true;
+    }
+    // File failed to load — fall back to synth
+  }
+
+  // Synth fallback
   const root = parseRoot(params.key);
 
   const generators: Record<AssetCategory, (ac: AudioContext, root: number, bpm: number) => void> = {
@@ -292,10 +415,6 @@ export function auditionAsset(params: AuditionParams): boolean {
 
   generators[params.category](ac, root, params.bpm || 120);
 
-  isPlaying = true;
-  currentAssetId = params.id;
-
-  // Auto-stop after max duration
   const durations: Record<AssetCategory, number> = {
     intro: 3200,
     loop: ((60 / (params.bpm || 120)) * 8 + 0.5) * 1000,

@@ -4,17 +4,17 @@ import type { MusicAsset, GameLevel } from "./projects";
 // ─── LEVEL 1: CENTRAL YARNBALL ──────────────────────────────────────────────
 
 const centralYarnballAssets: MusicAsset[] = [
-  { id: "a-cy-01", filename: "mus_yarnball_pajama_awakening_intro", category: "intro", duration: "0:32", bpm: 100, key: "Am", stems: ["purr_engine_rhythmic", "pajama_rustle_perc", "bell_collar_chime"] },
-  { id: "a-cy-02", filename: "mus_yarnball_patrol_loop", category: "loop", duration: "2:08", bpm: 100, key: "Am", stems: ["meow_choir_legato", "yarn_unraveling_tension", "milk_lap_bass", "bell_collar_chime"] },
+  { id: "a-cy-01", filename: "mus_yarnball_pajama_awakening_intro", category: "intro", duration: "0:32", bpm: 100, key: "Am", stems: ["purr_engine_rhythmic", "pajama_rustle_perc", "bell_collar_chime"], audioFile: "bloodborne2/mus_yarnball_pajama_awakening_intro.mp3" },
+  { id: "a-cy-02", filename: "mus_yarnball_patrol_loop", category: "loop", duration: "2:08", bpm: 100, key: "Am", stems: ["meow_choir_legato", "yarn_unraveling_tension", "milk_lap_bass", "bell_collar_chime"], audioFile: "bloodborne2/mus_yarnball_patrol_loop.mp3" },
   { id: "a-cy-03", filename: "mus_yarnball_suspicious_napping_stealth", category: "loop", duration: "1:44", bpm: 100, key: "Am", stems: ["purr_engine_rhythmic", "pajama_rustle_perc", "yarn_unraveling_tension"] },
   { id: "a-cy-04", filename: "mus_yarnball_gentle_pouncing_combat_lo", category: "loop", duration: "1:04", bpm: 150, key: "Am", stems: ["purr_engine_rhythmic", "meow_choir_legato", "milk_lap_bass", "bell_collar_chime"] },
-  { id: "a-cy-05", filename: "mus_yarnball_full_zoomies_combat_hi", category: "loop", duration: "1:04", bpm: 150, key: "Am", stems: ["purr_engine_rhythmic", "pajama_rustle_perc", "meow_choir_legato", "yarn_unraveling_tension", "milk_lap_bass"] },
-  { id: "a-cy-06", filename: "mus_yarnball_transition_nap_to_zoomies", category: "transition", duration: "0:04", bpm: 150, key: "Am", stems: ["bell_collar_chime", "meow_choir_legato"] },
-  { id: "a-cy-07", filename: "mus_yarnball_transition_zoomies_to_nap", category: "transition", duration: "0:06", bpm: 100, key: "Am", stems: ["purr_engine_rhythmic", "pajama_rustle_perc"] },
-  { id: "a-cy-08", filename: "mus_yarnball_stinger_first_hairball", category: "stinger", duration: "0:03", bpm: 150, key: "Am", stems: ["meow_choir_legato", "yarn_unraveling_tension"] },
-  { id: "a-cy-09", filename: "mus_yarnball_stinger_yarn_dropped", category: "stinger", duration: "0:02", bpm: 100, key: "Am", stems: ["bell_collar_chime", "milk_lap_bass"] },
-  { id: "a-cy-10", filename: "mus_yarnball_milk_saucer_victory", category: "ending", duration: "0:18", bpm: 100, key: "Am", stems: ["meow_choir_legato", "purr_engine_rhythmic", "bell_collar_chime"] },
-  { id: "a-cy-11", filename: "mus_yarnball_ambient_distant_purring", category: "layer", duration: "4:00", bpm: 0, key: "-", stems: ["drone_purr_cathedral", "pajama_fabric_shimmer"] },
+  { id: "a-cy-05", filename: "mus_yarnball_full_zoomies_combat_hi", category: "loop", duration: "1:04", bpm: 150, key: "Am", stems: ["purr_engine_rhythmic", "pajama_rustle_perc", "meow_choir_legato", "yarn_unraveling_tension", "milk_lap_bass"], audioFile: "bloodborne2/mus_yarnball_full_zoomies_combat.mp3" },
+  { id: "a-cy-06", filename: "mus_yarnball_transition_nap_to_zoomies", category: "transition", duration: "0:04", bpm: 150, key: "Am", stems: ["bell_collar_chime", "meow_choir_legato"], audioFile: "transition_sweep.mp3" },
+  { id: "a-cy-07", filename: "mus_yarnball_transition_zoomies_to_nap", category: "transition", duration: "0:06", bpm: 100, key: "Am", stems: ["purr_engine_rhythmic", "pajama_rustle_perc"], audioFile: "transition_sweep.mp3" },
+  { id: "a-cy-08", filename: "mus_yarnball_stinger_first_hairball", category: "stinger", duration: "0:03", bpm: 150, key: "Am", stems: ["meow_choir_legato", "yarn_unraveling_tension"], audioFile: "bloodborne2/stinger_frenzy_building.mp3" },
+  { id: "a-cy-09", filename: "mus_yarnball_stinger_yarn_dropped", category: "stinger", duration: "0:02", bpm: 100, key: "Am", stems: ["bell_collar_chime", "milk_lap_bass"], audioFile: "bloodborne2/stinger_bell_ring.mp3" },
+  { id: "a-cy-10", filename: "mus_yarnball_milk_saucer_victory", category: "ending", duration: "0:18", bpm: 100, key: "Am", stems: ["meow_choir_legato", "purr_engine_rhythmic", "bell_collar_chime"], audioFile: "bloodborne2/stinger_prey_slaughtered.mp3" },
+  { id: "a-cy-11", filename: "mus_yarnball_ambient_distant_purring", category: "layer", duration: "4:00", bpm: 0, key: "-", stems: ["drone_purr_cathedral", "pajama_fabric_shimmer"], audioFile: "bloodborne2/mus_bb2_hunters_dream_ambient.mp3" },
   { id: "a-cy-12", filename: "mus_yarnball_ambient_night_meows", category: "ambient", duration: "4:00", bpm: 0, key: "-", stems: ["meow_distant_plaintive", "wind_through_cat_flap"] },
 ];
 
@@ -54,18 +54,18 @@ const centralYarnballEdges: Edge[] = [
 // ─── LEVEL 2: THE FORBIDDEN LITTERBOX ───────────────────────────────────────
 
 const forbiddenLitterboxAssets: MusicAsset[] = [
-  { id: "a-fl-01", filename: "mus_litterbox_approach_intro", category: "intro", duration: "0:28", bpm: 92, key: "Bbm", stems: ["litter_crunch_rhythmic", "strings_olfactory_horror", "wind_stench_whistle"] },
+  { id: "a-fl-01", filename: "mus_litterbox_approach_intro", category: "intro", duration: "0:28", bpm: 92, key: "Bbm", stems: ["litter_crunch_rhythmic", "strings_olfactory_horror", "wind_stench_whistle"], audioFile: "bloodborne2/mus_litterbox_suspicious_sniffing_explore.mp3" },
   { id: "a-fl-02", filename: "mus_litterbox_scooping_duty_loop", category: "loop", duration: "2:16", bpm: 92, key: "Bbm", stems: ["scoop_scrape_perc", "oboe_regret_melody", "bass_deep_burial", "pad_ammonia_haze"] },
-  { id: "a-fl-03", filename: "mus_litterbox_forbidden_territory_explore", category: "loop", duration: "2:16", bpm: 92, key: "Bbm", stems: ["strings_forbidden_knowledge", "harp_granule_cascade", "synth_litter_dust_cloud"] },
-  { id: "a-fl-04", filename: "mus_litterbox_ambush_sandbox_combat_lo", category: "loop", duration: "1:00", bpm: 138, key: "Bbm", stems: ["perc_litter_scatter_slam", "brass_buried_treasure", "strings_clump_tension", "synth_dust_storm_aggro"] },
-  { id: "a-fl-05", filename: "mus_litterbox_great_uncovering_combat_hi", category: "loop", duration: "1:00", bpm: 138, key: "Bbm", stems: ["perc_litter_scatter_slam", "brass_full_excavation", "choir_what_lies_beneath", "synth_dust_storm_aggro", "taiko_box_rim_slam"] },
-  { id: "a-fl-06", filename: "mus_litterbox_transition_scoop_to_ambush", category: "transition", duration: "0:03", bpm: 138, key: "Bbm", stems: ["litter_avalanche_tuned", "brass_surprise_unburial"] },
-  { id: "a-fl-07", filename: "mus_litterbox_transition_ambush_to_scoop", category: "transition", duration: "0:05", bpm: 92, key: "Bbm", stems: ["scoop_scrape_perc", "pad_settling_dust"] },
-  { id: "a-fl-08", filename: "mus_litterbox_stinger_hairball_coughed", category: "stinger", duration: "0:03", bpm: 138, key: "Bbm", stems: ["choir_horror_reveal", "brass_wet_impact"] },
+  { id: "a-fl-03", filename: "mus_litterbox_forbidden_territory_explore", category: "loop", duration: "2:16", bpm: 92, key: "Bbm", stems: ["strings_forbidden_knowledge", "harp_granule_cascade", "synth_litter_dust_cloud"], audioFile: "bloodborne2/mus_litterbox_suspicious_sniffing_explore.mp3" },
+  { id: "a-fl-04", filename: "mus_litterbox_ambush_sandbox_combat_lo", category: "loop", duration: "1:00", bpm: 138, key: "Bbm", stems: ["perc_litter_scatter_slam", "brass_buried_treasure", "strings_clump_tension", "synth_dust_storm_aggro"], audioFile: "bloodborne2/mus_litterbox_forbidden_digging_combat.mp3" },
+  { id: "a-fl-05", filename: "mus_litterbox_great_uncovering_combat_hi", category: "loop", duration: "1:00", bpm: 138, key: "Bbm", stems: ["perc_litter_scatter_slam", "brass_full_excavation", "choir_what_lies_beneath", "synth_dust_storm_aggro", "taiko_box_rim_slam"], audioFile: "bloodborne2/mus_litterbox_forbidden_digging_combat.mp3" },
+  { id: "a-fl-06", filename: "mus_litterbox_transition_scoop_to_ambush", category: "transition", duration: "0:03", bpm: 138, key: "Bbm", stems: ["litter_avalanche_tuned", "brass_surprise_unburial"], audioFile: "transition_sweep.mp3" },
+  { id: "a-fl-07", filename: "mus_litterbox_transition_ambush_to_scoop", category: "transition", duration: "0:05", bpm: 92, key: "Bbm", stems: ["scoop_scrape_perc", "pad_settling_dust"], audioFile: "transition_sweep.mp3" },
+  { id: "a-fl-08", filename: "mus_litterbox_stinger_hairball_coughed", category: "stinger", duration: "0:03", bpm: 138, key: "Bbm", stems: ["choir_horror_reveal", "brass_wet_impact"], audioFile: "bloodborne2/stinger_you_died_meow.mp3" },
   { id: "a-fl-09", filename: "mus_litterbox_stinger_litter_scattered", category: "stinger", duration: "0:02", bpm: 92, key: "Bbm", stems: ["perc_granule_explosion", "strings_scattered_shame"] },
-  { id: "a-fl-10", filename: "mus_litterbox_ending_fresh_box", category: "ending", duration: "0:16", bpm: 92, key: "Bbm", stems: ["harp_clean_litter_bliss", "strings_fresh_scent", "bell_deodorizer_chime"] },
-  { id: "a-fl-11", filename: "mus_litterbox_layer_dust_cloud_amb", category: "layer", duration: "4:00", bpm: 0, key: "-", stems: ["drone_particulate_dread", "litter_grain_tinkle"] },
-  { id: "a-fl-12", filename: "mus_litterbox_ambient_buried_things", category: "ambient", duration: "4:00", bpm: 0, key: "-", stems: ["rumble_subterranean_secret", "scratch_distant_digging"] },
+  { id: "a-fl-10", filename: "mus_litterbox_ending_fresh_box", category: "ending", duration: "0:16", bpm: 92, key: "Bbm", stems: ["harp_clean_litter_bliss", "strings_fresh_scent", "bell_deodorizer_chime"], audioFile: "bloodborne2/stinger_prey_slaughtered.mp3" },
+  { id: "a-fl-11", filename: "mus_litterbox_layer_dust_cloud_amb", category: "layer", duration: "4:00", bpm: 0, key: "-", stems: ["drone_particulate_dread", "litter_grain_tinkle"], audioFile: "bloodborne2/mus_litterbox_ancient_litter_ambient.mp3" },
+  { id: "a-fl-12", filename: "mus_litterbox_ambient_buried_things", category: "ambient", duration: "4:00", bpm: 0, key: "-", stems: ["rumble_subterranean_secret", "scratch_distant_digging"], audioFile: "bloodborne2/mus_litterbox_ancient_litter_ambient.mp3" },
 ];
 
 const forbiddenLitterboxNodes: Node[] = [
@@ -103,17 +103,17 @@ const forbiddenLitterboxEdges: Edge[] = [
 // ─── LEVEL 3: CAINHURST CAT TOWER ──────────────────────────────────────────
 
 const cainhurstCatTowerAssets: MusicAsset[] = [
-  { id: "a-ct-01", filename: "mus_cattower_grand_ascent_intro", category: "intro", duration: "0:30", bpm: 84, key: "F#m", stems: ["harpsichord_regal_menace", "strings_velvet_curtain", "bell_silver_collar"] },
-  { id: "a-ct-02", filename: "mus_cattower_fancy_feast_waltz_loop", category: "loop", duration: "2:24", bpm: 84, key: "F#m", stems: ["harpsichord_regal_menace", "cello_aristocratic_purr", "harp_chandelier_glint", "perc_paw_pad_waltz"] },
+  { id: "a-ct-01", filename: "mus_cattower_grand_ascent_intro", category: "intro", duration: "0:30", bpm: 84, key: "F#m", stems: ["harpsichord_regal_menace", "strings_velvet_curtain", "bell_silver_collar"], audioFile: "bloodborne2/mus_bb2_main_theme_intro.mp3" },
+  { id: "a-ct-02", filename: "mus_cattower_fancy_feast_waltz_loop", category: "loop", duration: "2:24", bpm: 84, key: "F#m", stems: ["harpsichord_regal_menace", "cello_aristocratic_purr", "harp_chandelier_glint", "perc_paw_pad_waltz"], audioFile: "bloodborne2/mus_cattower_fancy_feast_waltz.mp3" },
   { id: "a-ct-03", filename: "mus_cattower_velvet_prowl_explore", category: "loop", duration: "2:24", bpm: 84, key: "F#m", stems: ["strings_velvet_curtain", "music_box_tower_climb", "bass_carpeted_stairs"] },
-  { id: "a-ct-04", filename: "mus_cattower_aristocat_combat_lo", category: "loop", duration: "1:08", bpm: 144, key: "F#m", stems: ["perc_scratching_post_slam", "brass_silver_spoon_fury", "strings_silk_ribbon_whip", "harpsichord_rapid_claws"] },
-  { id: "a-ct-05", filename: "mus_cattower_aristocat_combat_hi", category: "loop", duration: "1:08", bpm: 144, key: "F#m", stems: ["perc_scratching_post_slam", "brass_chandelier_crash", "choir_aristocratic_yowling", "harpsichord_rapid_claws", "organ_gothic_tower"] },
+  { id: "a-ct-04", filename: "mus_cattower_aristocat_combat_lo", category: "loop", duration: "1:08", bpm: 144, key: "F#m", stems: ["perc_scratching_post_slam", "brass_silver_spoon_fury", "strings_silk_ribbon_whip", "harpsichord_rapid_claws"], audioFile: "bloodborne2/mus_cattower_aristocat_combat.mp3" },
+  { id: "a-ct-05", filename: "mus_cattower_aristocat_combat_hi", category: "loop", duration: "1:08", bpm: 144, key: "F#m", stems: ["perc_scratching_post_slam", "brass_chandelier_crash", "choir_aristocratic_yowling", "harpsichord_rapid_claws", "organ_gothic_tower"], audioFile: "bloodborne2/mus_cattower_aristocat_combat.mp3" },
   { id: "a-ct-06", filename: "mus_cattower_vileblood_tabby_boss", category: "loop", duration: "1:44", bpm: 144, key: "F#m", stems: ["everything_vileblood_phase1"] },
-  { id: "a-ct-07", filename: "mus_cattower_transition_waltz_to_combat", category: "transition", duration: "0:04", bpm: 144, key: "F#m", stems: ["harpsichord_shatter", "brass_monocle_drop"] },
-  { id: "a-ct-08", filename: "mus_cattower_transition_combat_to_waltz", category: "transition", duration: "0:06", bpm: 84, key: "F#m", stems: ["harp_composure_regained", "strings_straighten_bowtie"] },
-  { id: "a-ct-09", filename: "mus_cattower_stinger_crown_knocked", category: "stinger", duration: "0:03", bpm: 144, key: "F#m", stems: ["brass_royal_gasp", "perc_crown_bounce"] },
+  { id: "a-ct-07", filename: "mus_cattower_transition_waltz_to_combat", category: "transition", duration: "0:04", bpm: 144, key: "F#m", stems: ["harpsichord_shatter", "brass_monocle_drop"], audioFile: "transition_sweep.mp3" },
+  { id: "a-ct-08", filename: "mus_cattower_transition_combat_to_waltz", category: "transition", duration: "0:06", bpm: 84, key: "F#m", stems: ["harp_composure_regained", "strings_straighten_bowtie"], audioFile: "transition_sweep.mp3" },
+  { id: "a-ct-09", filename: "mus_cattower_stinger_crown_knocked", category: "stinger", duration: "0:03", bpm: 144, key: "F#m", stems: ["brass_royal_gasp", "perc_crown_bounce"], audioFile: "bloodborne2/stinger_insight_gained.mp3" },
   { id: "a-ct-10", filename: "mus_cattower_stinger_curtain_climbed", category: "stinger", duration: "0:02", bpm: 84, key: "F#m", stems: ["strings_fabric_tear_musical", "bell_silver_collar"] },
-  { id: "a-ct-11", filename: "mus_cattower_ending_tower_sunset", category: "ending", duration: "0:20", bpm: 84, key: "F#m", stems: ["harpsichord_regal_menace", "cello_aristocratic_purr", "bell_silver_collar"] },
+  { id: "a-ct-11", filename: "mus_cattower_ending_tower_sunset", category: "ending", duration: "0:20", bpm: 84, key: "F#m", stems: ["harpsichord_regal_menace", "cello_aristocratic_purr", "bell_silver_collar"], audioFile: "bloodborne2/mus_cattower_fancy_feast_waltz.mp3" },
   { id: "a-ct-12", filename: "mus_cattower_layer_castle_amb", category: "layer", duration: "4:00", bpm: 0, key: "-", stems: ["drone_dusty_nobility", "fireplace_crackle_rhythmic"] },
 ];
 
@@ -152,15 +152,15 @@ const cainhurstCatTowerEdges: Edge[] = [
 // ─── LEVEL 4: BYRGENWERTH ACADEMY FOR GIFTED KITTENS ────────────────────────
 
 const byrgenswerthAcademyAssets: MusicAsset[] = [
-  { id: "a-ba-01", filename: "mus_academy_scholarly_purring_intro", category: "intro", duration: "0:26", bpm: 96, key: "Dm", stems: ["piano_academic_curiosity", "strings_library_dust", "synth_catnip_vapor"] },
-  { id: "a-ba-02", filename: "mus_academy_scholarly_purring_loop", category: "loop", duration: "2:12", bpm: 96, key: "Dm", stems: ["piano_academic_curiosity", "cello_thesis_defense", "harp_page_turn", "perc_chalk_tap"] },
+  { id: "a-ba-01", filename: "mus_academy_scholarly_purring_intro", category: "intro", duration: "0:26", bpm: 96, key: "Dm", stems: ["piano_academic_curiosity", "strings_library_dust", "synth_catnip_vapor"], audioFile: "bloodborne2/mus_academy_lecture_hall_explore.mp3" },
+  { id: "a-ba-02", filename: "mus_academy_scholarly_purring_loop", category: "loop", duration: "2:12", bpm: 96, key: "Dm", stems: ["piano_academic_curiosity", "cello_thesis_defense", "harp_page_turn", "perc_chalk_tap"], audioFile: "bloodborne2/mus_academy_lecture_hall_explore.mp3" },
   { id: "a-ba-03", filename: "mus_academy_moonlit_kitten_lake_ambient", category: "ambient", duration: "3:20", bpm: 96, key: "Dm", stems: ["synth_moonlight_shimmer", "harp_water_ripple", "pad_cosmic_wonder", "choir_distant_meow"] },
-  { id: "a-ba-04", filename: "mus_academy_rom_phase1_loop", category: "loop", duration: "1:28", bpm: 152, key: "Dm", stems: ["perc_tiny_paw_stampede", "brass_cosmic_kitten_fury", "strings_web_of_yarn", "synth_vacuous_purr"] },
-  { id: "a-ba-05", filename: "mus_academy_rom_phase2_loop", category: "loop", duration: "1:28", bpm: 152, key: "Dm", stems: ["perc_tiny_paw_stampede", "brass_full_cosmic_meltdown", "choir_eldritch_mewling", "synth_vacuous_purr", "organ_great_kitten_beyond"] },
-  { id: "a-ba-06", filename: "mus_academy_transition_study_to_combat", category: "transition", duration: "0:04", bpm: 152, key: "Dm", stems: ["piano_book_slam", "brass_knowledge_is_pain"] },
-  { id: "a-ba-07", filename: "mus_academy_transition_combat_to_study", category: "transition", duration: "0:05", bpm: 96, key: "Dm", stems: ["harp_settling_dust", "synth_catnip_exhale"] },
-  { id: "a-ba-08", filename: "mus_academy_stinger_rom_spiders", category: "stinger", duration: "0:03", bpm: 152, key: "Dm", stems: ["strings_tiny_legs_scurry", "perc_kitten_swarm_impact"] },
-  { id: "a-ba-09", filename: "mus_academy_stinger_moonlit_splash", category: "stinger", duration: "0:04", bpm: 96, key: "Dm", stems: ["harp_moonbeam_cascade", "choir_wet_kitten_shock"] },
+  { id: "a-ba-04", filename: "mus_academy_rom_phase1_loop", category: "loop", duration: "1:28", bpm: 152, key: "Dm", stems: ["perc_tiny_paw_stampede", "brass_cosmic_kitten_fury", "strings_web_of_yarn", "synth_vacuous_purr"], audioFile: "bloodborne2/mus_academy_pop_quiz_combat.mp3" },
+  { id: "a-ba-05", filename: "mus_academy_rom_phase2_loop", category: "loop", duration: "1:28", bpm: 152, key: "Dm", stems: ["perc_tiny_paw_stampede", "brass_full_cosmic_meltdown", "choir_eldritch_mewling", "synth_vacuous_purr", "organ_great_kitten_beyond"], audioFile: "bloodborne2/mus_academy_pop_quiz_combat.mp3" },
+  { id: "a-ba-06", filename: "mus_academy_transition_study_to_combat", category: "transition", duration: "0:04", bpm: 152, key: "Dm", stems: ["piano_book_slam", "brass_knowledge_is_pain"], audioFile: "transition_sweep.mp3" },
+  { id: "a-ba-07", filename: "mus_academy_transition_combat_to_study", category: "transition", duration: "0:05", bpm: 96, key: "Dm", stems: ["harp_settling_dust", "synth_catnip_exhale"], audioFile: "transition_sweep.mp3" },
+  { id: "a-ba-08", filename: "mus_academy_stinger_rom_spiders", category: "stinger", duration: "0:03", bpm: 152, key: "Dm", stems: ["strings_tiny_legs_scurry", "perc_kitten_swarm_impact"], audioFile: "bloodborne2/stinger_frenzy_building.mp3" },
+  { id: "a-ba-09", filename: "mus_academy_stinger_moonlit_splash", category: "stinger", duration: "0:04", bpm: 96, key: "Dm", stems: ["harp_moonbeam_cascade", "choir_wet_kitten_shock"], audioFile: "bloodborne2/stinger_insight_gained.mp3" },
   { id: "a-ba-10", filename: "mus_academy_ending_graduation", category: "ending", duration: "0:18", bpm: 96, key: "Dm", stems: ["piano_academic_curiosity", "strings_diploma_swell", "choir_commencement_meow"] },
   { id: "a-ba-11", filename: "mus_academy_layer_library_amb", category: "layer", duration: "4:00", bpm: 0, key: "-", stems: ["drone_accumulated_knowledge", "page_rustle_rhythmic"] },
 ];
@@ -199,17 +199,17 @@ const byrgenswerthAcademyEdges: Edge[] = [
 // ─── LEVEL 5: THE NIGHTMARE OF MEOWTSIS ─────────────────────────────────────
 
 const nightmareMeowtisAssets: MusicAsset[] = [
-  { id: "a-nm-01", filename: "mus_meowtsis_nightmare_lullaby_intro", category: "intro", duration: "0:34", bpm: 80, key: "Ebm", stems: ["music_box_broken_lullaby", "strings_nightmare_blanket", "synth_sleep_paralysis_purr"] },
+  { id: "a-nm-01", filename: "mus_meowtsis_nightmare_lullaby_intro", category: "intro", duration: "0:34", bpm: 80, key: "Ebm", stems: ["music_box_broken_lullaby", "strings_nightmare_blanket", "synth_sleep_paralysis_purr"], audioFile: "bloodborne2/mus_nightmare_bad_dream_explore.mp3" },
   { id: "a-nm-02", filename: "mus_meowtsis_frenzy_nap_loop", category: "loop", duration: "2:24", bpm: 80, key: "Ebm", stems: ["music_box_broken_lullaby", "cello_restless_dreaming", "harp_pillow_feather_fall", "perc_tossing_turning"] },
-  { id: "a-nm-03", filename: "mus_meowtsis_bad_dream_explore", category: "loop", duration: "2:24", bpm: 80, key: "Ebm", stems: ["synth_sleep_paralysis_purr", "strings_nightmare_blanket", "pad_warm_milk_gone_cold"] },
-  { id: "a-nm-04", filename: "mus_meowtsis_pillow_fort_combat_lo", category: "loop", duration: "1:04", bpm: 160, key: "Ebm", stems: ["perc_pillow_slam", "brass_blanket_fort_charge", "strings_nightmare_unraveling", "synth_alarm_clock_fury"] },
-  { id: "a-nm-05", filename: "mus_meowtsis_pillow_fort_combat_hi", category: "loop", duration: "1:04", bpm: 160, key: "Ebm", stems: ["perc_pillow_slam", "brass_full_pillow_war", "choir_nightmare_yowling", "synth_alarm_clock_fury", "organ_dream_cathedral"] },
-  { id: "a-nm-06", filename: "mus_meowtsis_micolash_boss_loop", category: "loop", duration: "1:44", bpm: 160, key: "Ebm", stems: ["everything_micolash_pillow_fort_phase1"] },
-  { id: "a-nm-07", filename: "mus_meowtsis_transition_nap_to_nightmare", category: "transition", duration: "0:04", bpm: 160, key: "Ebm", stems: ["music_box_shatter", "brass_rude_awakening"] },
-  { id: "a-nm-08", filename: "mus_meowtsis_transition_nightmare_to_nap", category: "transition", duration: "0:06", bpm: 80, key: "Ebm", stems: ["harp_drifting_off", "pad_warm_milk_settling"] },
-  { id: "a-nm-09", filename: "mus_meowtsis_stinger_pillow_fort_collapse", category: "stinger", duration: "0:03", bpm: 160, key: "Ebm", stems: ["perc_structural_pillow_failure", "choir_cushion_catastrophe"] },
+  { id: "a-nm-03", filename: "mus_meowtsis_bad_dream_explore", category: "loop", duration: "2:24", bpm: 80, key: "Ebm", stems: ["synth_sleep_paralysis_purr", "strings_nightmare_blanket", "pad_warm_milk_gone_cold"], audioFile: "bloodborne2/mus_nightmare_bad_dream_explore.mp3" },
+  { id: "a-nm-04", filename: "mus_meowtsis_pillow_fort_combat_lo", category: "loop", duration: "1:04", bpm: 160, key: "Ebm", stems: ["perc_pillow_slam", "brass_blanket_fort_charge", "strings_nightmare_unraveling", "synth_alarm_clock_fury"], audioFile: "bloodborne2/mus_nightmare_micolash_pillow_fort.mp3" },
+  { id: "a-nm-05", filename: "mus_meowtsis_pillow_fort_combat_hi", category: "loop", duration: "1:04", bpm: 160, key: "Ebm", stems: ["perc_pillow_slam", "brass_full_pillow_war", "choir_nightmare_yowling", "synth_alarm_clock_fury", "organ_dream_cathedral"], audioFile: "bloodborne2/mus_nightmare_micolash_pillow_fort.mp3" },
+  { id: "a-nm-06", filename: "mus_meowtsis_micolash_boss_loop", category: "loop", duration: "1:44", bpm: 160, key: "Ebm", stems: ["everything_micolash_pillow_fort_phase1"], audioFile: "bloodborne2/mus_nightmare_micolash_pillow_fort.mp3" },
+  { id: "a-nm-07", filename: "mus_meowtsis_transition_nap_to_nightmare", category: "transition", duration: "0:04", bpm: 160, key: "Ebm", stems: ["music_box_shatter", "brass_rude_awakening"], audioFile: "transition_sweep.mp3" },
+  { id: "a-nm-08", filename: "mus_meowtsis_transition_nightmare_to_nap", category: "transition", duration: "0:06", bpm: 80, key: "Ebm", stems: ["harp_drifting_off", "pad_warm_milk_settling"], audioFile: "transition_sweep.mp3" },
+  { id: "a-nm-09", filename: "mus_meowtsis_stinger_pillow_fort_collapse", category: "stinger", duration: "0:03", bpm: 160, key: "Ebm", stems: ["perc_structural_pillow_failure", "choir_cushion_catastrophe"], audioFile: "bloodborne2/stinger_you_died_meow.mp3" },
   { id: "a-nm-10", filename: "mus_meowtsis_stinger_blanket_stolen", category: "stinger", duration: "0:02", bpm: 80, key: "Ebm", stems: ["strings_exposed_belly_horror", "brass_cold_air_assault"] },
-  { id: "a-nm-11", filename: "mus_meowtsis_ending_sweet_dreams", category: "ending", duration: "0:20", bpm: 80, key: "Ebm", stems: ["music_box_broken_lullaby", "strings_nightmare_blanket", "harp_pillow_feather_fall"] },
+  { id: "a-nm-11", filename: "mus_meowtsis_ending_sweet_dreams", category: "ending", duration: "0:20", bpm: 80, key: "Ebm", stems: ["music_box_broken_lullaby", "strings_nightmare_blanket", "harp_pillow_feather_fall"], audioFile: "bloodborne2/stinger_prey_slaughtered.mp3" },
   { id: "a-nm-12", filename: "mus_meowtsis_layer_nightmare_amb", category: "layer", duration: "4:00", bpm: 0, key: "-", stems: ["drone_sleep_debt", "purr_distorted_nightmare"] },
 ];
 
@@ -249,18 +249,18 @@ const nightmareMeowtisEdges: Edge[] = [
 // ─── LEVEL 6: HUNTER'S NAP (FINAL DREAM) ───────────────────────────────────
 
 const huntersNapAssets: MusicAsset[] = [
-  { id: "a-hn-01", filename: "mus_huntersnap_dolls_lullaby_intro", category: "intro", duration: "0:40", bpm: 72, key: "Am", stems: ["music_box_porcelain_tender", "strings_gentle_memory", "harp_garden_gate"] },
-  { id: "a-hn-02", filename: "mus_huntersnap_garden_of_cat_graves_loop", category: "loop", duration: "2:36", bpm: 72, key: "Am", stems: ["music_box_porcelain_tender", "cello_memorial_purr", "harp_tombstone_wind", "perc_pawprint_path"] },
+  { id: "a-hn-01", filename: "mus_huntersnap_dolls_lullaby_intro", category: "intro", duration: "0:40", bpm: 72, key: "Am", stems: ["music_box_porcelain_tender", "strings_gentle_memory", "harp_garden_gate"], audioFile: "bloodborne2/mus_huntersnap_final_dream_intro.mp3" },
+  { id: "a-hn-02", filename: "mus_huntersnap_garden_of_cat_graves_loop", category: "loop", duration: "2:36", bpm: 72, key: "Am", stems: ["music_box_porcelain_tender", "cello_memorial_purr", "harp_tombstone_wind", "perc_pawprint_path"], audioFile: "bloodborne2/mus_bb2_hunters_dream_ambient.mp3" },
   { id: "a-hn-03", filename: "mus_huntersnap_workshop_explore", category: "loop", duration: "2:36", bpm: 72, key: "Am", stems: ["strings_gentle_memory", "piano_old_toys", "pad_fireside_warmth"] },
-  { id: "a-hn-04", filename: "mus_huntersnap_gehrman_phase1_loop", category: "loop", duration: "1:28", bpm: 140, key: "Am", stems: ["perc_wheelchair_rhythm", "brass_old_hunter_fury", "strings_final_lullaby", "choir_nine_lives_spent"] },
-  { id: "a-hn-05", filename: "mus_huntersnap_gehrman_phase2_loop", category: "loop", duration: "1:28", bpm: 140, key: "Am", stems: ["perc_wheelchair_rhythm", "brass_last_stand_full", "choir_eternal_naptime", "strings_final_lullaby", "organ_dream_requiem"] },
-  { id: "a-hn-06", filename: "mus_huntersnap_gehrman_phase3_loop", category: "loop", duration: "1:28", bpm: 155, key: "Am", stems: ["everything_gehrman_phase3_transcendent"] },
-  { id: "a-hn-07", filename: "mus_huntersnap_moon_presence_boss", category: "loop", duration: "2:00", bpm: 160, key: "Am", stems: ["everything_moon_presence_belly_rub"] },
-  { id: "a-hn-08", filename: "mus_huntersnap_transition_peace_to_fight", category: "transition", duration: "0:04", bpm: 140, key: "Am", stems: ["wheelchair_creak_tuned", "brass_stand_up_old_cat"] },
+  { id: "a-hn-04", filename: "mus_huntersnap_gehrman_phase1_loop", category: "loop", duration: "1:28", bpm: 140, key: "Am", stems: ["perc_wheelchair_rhythm", "brass_old_hunter_fury", "strings_final_lullaby", "choir_nine_lives_spent"], audioFile: "bloodborne2/mus_huntersnap_gehrman_fight.mp3" },
+  { id: "a-hn-05", filename: "mus_huntersnap_gehrman_phase2_loop", category: "loop", duration: "1:28", bpm: 140, key: "Am", stems: ["perc_wheelchair_rhythm", "brass_last_stand_full", "choir_eternal_naptime", "strings_final_lullaby", "organ_dream_requiem"], audioFile: "bloodborne2/mus_huntersnap_gehrman_fight.mp3" },
+  { id: "a-hn-06", filename: "mus_huntersnap_gehrman_phase3_loop", category: "loop", duration: "1:28", bpm: 155, key: "Am", stems: ["everything_gehrman_phase3_transcendent"], audioFile: "bloodborne2/mus_huntersnap_gehrman_fight.mp3" },
+  { id: "a-hn-07", filename: "mus_huntersnap_moon_presence_boss", category: "loop", duration: "2:00", bpm: 160, key: "Am", stems: ["everything_moon_presence_belly_rub"], audioFile: "bloodborne2/mus_huntersnap_moon_presence_boss.mp3" },
+  { id: "a-hn-08", filename: "mus_huntersnap_transition_peace_to_fight", category: "transition", duration: "0:04", bpm: 140, key: "Am", stems: ["wheelchair_creak_tuned", "brass_stand_up_old_cat"], audioFile: "transition_sweep.mp3" },
   { id: "a-hn-09", filename: "mus_huntersnap_stinger_wheelchair_creak", category: "stinger", duration: "0:03", bpm: 72, key: "Am", stems: ["wheelchair_creak_lonely", "strings_old_bones"] },
-  { id: "a-hn-10", filename: "mus_huntersnap_stinger_final_bell", category: "stinger", duration: "0:05", bpm: 140, key: "Am", stems: ["bell_great_cat_toll", "choir_it_is_time"] },
-  { id: "a-hn-11", filename: "mus_huntersnap_stinger_secret_boss", category: "stinger", duration: "0:04", bpm: 160, key: "Am", stems: ["synth_cosmic_belly_reveal", "choir_eldritch_purr"] },
-  { id: "a-hn-12", filename: "mus_huntersnap_ending_accept_the_nap", category: "ending", duration: "1:00", bpm: 72, key: "Am", stems: ["music_box_porcelain_tender", "strings_gentle_memory", "choir_goodnight_hunter", "harp_final_dream"] },
+  { id: "a-hn-10", filename: "mus_huntersnap_stinger_final_bell", category: "stinger", duration: "0:05", bpm: 140, key: "Am", stems: ["bell_great_cat_toll", "choir_it_is_time"], audioFile: "bloodborne2/stinger_bell_ring.mp3" },
+  { id: "a-hn-11", filename: "mus_huntersnap_stinger_secret_boss", category: "stinger", duration: "0:04", bpm: 160, key: "Am", stems: ["synth_cosmic_belly_reveal", "choir_eldritch_purr"], audioFile: "bloodborne2/stinger_frenzy_building.mp3" },
+  { id: "a-hn-12", filename: "mus_huntersnap_ending_accept_the_nap", category: "ending", duration: "1:00", bpm: 72, key: "Am", stems: ["music_box_porcelain_tender", "strings_gentle_memory", "choir_goodnight_hunter", "harp_final_dream"], audioFile: "bloodborne2/mus_huntersnap_final_dream_intro.mp3" },
 ];
 
 const huntersNapNodes: Node[] = [

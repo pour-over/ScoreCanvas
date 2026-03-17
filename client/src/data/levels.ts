@@ -4,16 +4,16 @@ import type { MusicAsset, GameLevel } from "./projects";
 // ─── LEVEL 1: THE WHISPERING SANDS ──────────────────────────────────────────
 
 const whisperingSandsAssets: MusicAsset[] = [
-  { id: "a-ws-01", filename: "mus_sands_scarf_awakens_intro", category: "intro", duration: "0:28", bpm: 88, key: "Dm", stems: ["scarf_flap_menacing", "choir_passive_aggressive", "wind_judgmental"] },
-  { id: "a-ws-02", filename: "mus_sands_bloodcurdling_serenity_loop", category: "loop", duration: "2:12", bpm: 88, key: "Dm", stems: ["harp_of_doom", "flute_ominous_peace", "strings_deceptive_calm", "perc_sand_shuffle"] },
-  { id: "a-ws-03", filename: "mus_sands_false_tranquility_loop", category: "loop", duration: "2:12", bpm: 88, key: "Dm", stems: ["kalimba_threat", "pad_sinister_warmth", "bass_lurking"] },
+  { id: "a-ws-01", filename: "mus_sands_scarf_awakens_intro", category: "intro", duration: "0:28", bpm: 88, key: "Dm", stems: ["scarf_flap_menacing", "choir_passive_aggressive", "wind_judgmental"], audioFile: "journey2/mus_journey2_main_theme_intro.mp3" },
+  { id: "a-ws-02", filename: "mus_sands_bloodcurdling_serenity_loop", category: "loop", duration: "2:12", bpm: 88, key: "Dm", stems: ["harp_of_doom", "flute_ominous_peace", "strings_deceptive_calm", "perc_sand_shuffle"], audioFile: "journey2/mus_sands_gentle_hugs_explore.mp3" },
+  { id: "a-ws-03", filename: "mus_sands_false_tranquility_loop", category: "loop", duration: "2:12", bpm: 88, key: "Dm", stems: ["kalimba_threat", "pad_sinister_warmth", "bass_lurking"], audioFile: "journey2/mus_sands_false_tranquility_loop.mp3" },
   { id: "a-ws-04", filename: "mus_sands_gentle_hugs_combat_lo", category: "loop", duration: "1:08", bpm: 132, key: "Dm", stems: ["perc_sand_whale_stomp", "brass_affectionate_violence", "strings_concerned", "synth_dune_rage"] },
-  { id: "a-ws-05", filename: "mus_sands_gentle_hugs_combat_hi", category: "loop", duration: "1:08", bpm: 132, key: "Dm", stems: ["perc_sand_whale_stomp", "brass_full_embrace", "choir_screaming_softly", "synth_dune_rage", "scarf_whip_crack"] },
-  { id: "a-ws-06", filename: "mus_sands_transition_peace_to_carnage", category: "transition", duration: "0:04", bpm: 132, key: "Dm", stems: ["sand_whale_roar_tuned", "perc_dune_collapse"] },
-  { id: "a-ws-07", filename: "mus_sands_transition_carnage_to_peace", category: "transition", duration: "0:06", bpm: 88, key: "Dm", stems: ["harp_apologetic", "wind_settling_scores"] },
+  { id: "a-ws-05", filename: "mus_sands_gentle_hugs_combat_hi", category: "loop", duration: "1:08", bpm: 132, key: "Dm", stems: ["perc_sand_whale_stomp", "brass_full_embrace", "choir_screaming_softly", "synth_dune_rage", "scarf_whip_crack"], audioFile: "journey2/mus_sands_gentle_hugs_combat_hi.mp3" },
+  { id: "a-ws-06", filename: "mus_sands_transition_peace_to_carnage", category: "transition", duration: "0:04", bpm: 132, key: "Dm", stems: ["sand_whale_roar_tuned", "perc_dune_collapse"], audioFile: "transition_sweep.mp3" },
+  { id: "a-ws-07", filename: "mus_sands_transition_carnage_to_peace", category: "transition", duration: "0:06", bpm: 88, key: "Dm", stems: ["harp_apologetic", "wind_settling_scores"], audioFile: "transition_sweep.mp3" },
   { id: "a-ws-08", filename: "mus_sands_stinger_cloth_creature_death", category: "stinger", duration: "0:03", bpm: 88, key: "Dm", stems: ["cloth_rip_musical", "choir_single_tear"] },
-  { id: "a-ws-09", filename: "mus_sands_stinger_sand_whale_spotted", category: "stinger", duration: "0:02", bpm: 132, key: "Dm", stems: ["brass_oh_no", "perc_tremor_comedic"] },
-  { id: "a-ws-10", filename: "mus_sands_ending_scarf_eulogy", category: "ending", duration: "0:14", bpm: 88, key: "Dm", stems: ["strings_weeping_gently", "choir_farewell_scarf", "wind_final_sigh"] },
+  { id: "a-ws-09", filename: "mus_sands_stinger_sand_whale_spotted", category: "stinger", duration: "0:02", bpm: 132, key: "Dm", stems: ["brass_oh_no", "perc_tremor_comedic"], audioFile: "journey2/stinger_sand_whale_approaching.mp3" },
+  { id: "a-ws-10", filename: "mus_sands_ending_scarf_eulogy", category: "ending", duration: "0:14", bpm: 88, key: "Dm", stems: ["strings_weeping_gently", "choir_farewell_scarf", "wind_final_sigh"], audioFile: "journey2/stinger_chapter_complete.mp3" },
   { id: "a-ws-11", filename: "mus_sands_ambient_dune_whispers", category: "layer", duration: "4:00", bpm: 0, key: "-", stems: ["drone_existential_sand", "whisper_ancient_regret"] },
   { id: "a-ws-12", filename: "mus_sands_ambient_whale_song_distant", category: "ambient", duration: "4:00", bpm: 0, key: "-", stems: ["whale_hum_threatening", "sand_grain_tinkle"] },
 ];
@@ -55,17 +55,17 @@ const whisperingSandsEdges: Edge[] = [
 
 const babblingBrookAssets: MusicAsset[] = [
   { id: "a-bb-01", filename: "mus_brook_waters_of_regret_intro", category: "intro", duration: "0:24", bpm: 96, key: "F#m", stems: ["water_drops_ominous", "flute_spa_from_hell", "strings_tension_soothing"] },
-  { id: "a-bb-02", filename: "mus_brook_genocide_waltz_loop", category: "loop", duration: "1:48", bpm: 96, key: "F#m", stems: ["harp_babbling", "oboe_mournful_joy", "bass_gentle_menace", "perc_river_stones"] },
+  { id: "a-bb-02", filename: "mus_brook_genocide_waltz_loop", category: "loop", duration: "1:48", bpm: 96, key: "F#m", stems: ["harp_babbling", "oboe_mournful_joy", "bass_gentle_menace", "perc_river_stones"], audioFile: "journey2/mus_brook_peaceful_massacre_explore.mp3" },
   { id: "a-bb-03", filename: "mus_brook_whispered_threats_stealth", category: "loop", duration: "1:48", bpm: 96, key: "F#m", stems: ["synth_underwater_dread", "perc_drip_tick", "bass_sub_current"] },
   { id: "a-bb-04", filename: "mus_brook_tranquil_fury_combat_lo", category: "loop", duration: "0:56", bpm: 144, key: "F#m", stems: ["perc_waterfall_slam", "brass_rapids_rage", "strings_undertow", "synth_splash_aggro"] },
-  { id: "a-bb-05", filename: "mus_brook_tranquil_fury_combat_hi", category: "loop", duration: "0:56", bpm: 144, key: "F#m", stems: ["perc_waterfall_slam", "brass_tsunami_embrace", "choir_drowning_harmonies", "synth_splash_aggro", "fish_slap_rhythmic"] },
-  { id: "a-bb-06", filename: "mus_brook_transition_calm_to_damp_fury", category: "transition", duration: "0:03", bpm: 144, key: "F#m", stems: ["splash_impact_tuned", "perc_dam_break"] },
-  { id: "a-bb-07", filename: "mus_brook_transition_fury_to_babbling", category: "transition", duration: "0:05", bpm: 96, key: "F#m", stems: ["harp_wringing_out", "water_recede_tonal"] },
-  { id: "a-bb-08", filename: "mus_brook_transition_explore_to_stealth", category: "transition", duration: "0:03", bpm: 96, key: "F#m", stems: ["synth_submerge", "perc_fade_drip"] },
+  { id: "a-bb-05", filename: "mus_brook_tranquil_fury_combat_hi", category: "loop", duration: "0:56", bpm: 144, key: "F#m", stems: ["perc_waterfall_slam", "brass_tsunami_embrace", "choir_drowning_harmonies", "synth_splash_aggro", "fish_slap_rhythmic"], audioFile: "journey2/mus_brook_destruction_lullaby_combat.mp3" },
+  { id: "a-bb-06", filename: "mus_brook_transition_calm_to_damp_fury", category: "transition", duration: "0:03", bpm: 144, key: "F#m", stems: ["splash_impact_tuned", "perc_dam_break"], audioFile: "transition_sweep.mp3" },
+  { id: "a-bb-07", filename: "mus_brook_transition_fury_to_babbling", category: "transition", duration: "0:05", bpm: 96, key: "F#m", stems: ["harp_wringing_out", "water_recede_tonal"], audioFile: "transition_sweep.mp3" },
+  { id: "a-bb-08", filename: "mus_brook_transition_explore_to_stealth", category: "transition", duration: "0:03", bpm: 96, key: "F#m", stems: ["synth_submerge", "perc_fade_drip"], audioFile: "transition_sweep.mp3" },
   { id: "a-bb-09", filename: "mus_brook_stinger_aggressive_fish", category: "stinger", duration: "0:02", bpm: 144, key: "F#m", stems: ["fish_bite_chromatic", "perc_splash_hit"] },
   { id: "a-bb-10", filename: "mus_brook_stinger_waterfall_discovery", category: "stinger", duration: "0:04", bpm: 96, key: "F#m", stems: ["choir_moist_awe", "harp_cascade_doom"] },
-  { id: "a-bb-11", filename: "mus_brook_ending_cranberry_sunset", category: "ending", duration: "0:16", bpm: 96, key: "F#m", stems: ["strings_spa_closing", "flute_farewell_damp", "water_musical_drain"] },
-  { id: "a-bb-12", filename: "mus_brook_layer_underwater_amb", category: "layer", duration: "4:00", bpm: 0, key: "-", stems: ["drone_subaquatic_malice", "bubble_sinister_pop"] },
+  { id: "a-bb-11", filename: "mus_brook_ending_cranberry_sunset", category: "ending", duration: "0:16", bpm: 96, key: "F#m", stems: ["strings_spa_closing", "flute_farewell_damp", "water_musical_drain"], audioFile: "journey2/stinger_chapter_complete.mp3" },
+  { id: "a-bb-12", filename: "mus_brook_layer_underwater_amb", category: "layer", duration: "4:00", bpm: 0, key: "-", stems: ["drone_subaquatic_malice", "bubble_sinister_pop"], audioFile: "journey2/mus_brook_carnage_creek_ambient.mp3" },
 ];
 
 const babblingBrookNodes: Node[] = [
@@ -107,17 +107,17 @@ const babblingBrookEdges: Edge[] = [
 
 const tranquilGardensAssets: MusicAsset[] = [
   { id: "a-tg-01", filename: "mus_garden_petal_of_dread_intro", category: "intro", duration: "0:26", bpm: 82, key: "Bbm", stems: ["music_box_sinister", "strings_thorny", "wind_chime_threatening"] },
-  { id: "a-tg-02", filename: "mus_garden_existential_dread_loop", category: "loop", duration: "2:16", bpm: 82, key: "Bbm", stems: ["harp_wilting", "flute_photosynthesis", "bass_root_system", "perc_falling_petals"] },
+  { id: "a-tg-02", filename: "mus_garden_existential_dread_loop", category: "loop", duration: "2:16", bpm: 82, key: "Bbm", stems: ["harp_wilting", "flute_photosynthesis", "bass_root_system", "perc_falling_petals"], audioFile: "journey2/mus_garden_horror_blossom_explore.mp3" },
   { id: "a-tg-03", filename: "mus_garden_violent_meditation_puzzle", category: "loop", duration: "1:28", bpm: 82, key: "Bbm", stems: ["music_box_contemplative_rage", "synth_zen_fury", "bass_deep_breath"] },
   { id: "a-tg-04", filename: "mus_garden_aggressive_yoga_combat_lo", category: "loop", duration: "1:04", bpm: 138, key: "Bbm", stems: ["perc_compost_slam", "brass_thorns", "strings_vine_whip", "synth_chlorophyll_rage"] },
-  { id: "a-tg-05", filename: "mus_garden_aggressive_yoga_combat_hi", category: "loop", duration: "1:04", bpm: 138, key: "Bbm", stems: ["perc_compost_slam", "brass_thorns", "choir_photosynthetic_screaming", "synth_chlorophyll_rage", "taiko_tree_trunk"] },
-  { id: "a-tg-06", filename: "mus_garden_transition_peace_to_pruning", category: "transition", duration: "0:04", bpm: 138, key: "Bbm", stems: ["vine_snap_tuned", "perc_soil_eruption"] },
-  { id: "a-tg-07", filename: "mus_garden_transition_pruning_to_peace", category: "transition", duration: "0:06", bpm: 82, key: "Bbm", stems: ["chime_regrowth", "strings_compost_settle"] },
+  { id: "a-tg-05", filename: "mus_garden_aggressive_yoga_combat_hi", category: "loop", duration: "1:04", bpm: 138, key: "Bbm", stems: ["perc_compost_slam", "brass_thorns", "choir_photosynthetic_screaming", "synth_chlorophyll_rage", "taiko_tree_trunk"], audioFile: "journey2/mus_garden_petal_destruction_combat.mp3" },
+  { id: "a-tg-06", filename: "mus_garden_transition_peace_to_pruning", category: "transition", duration: "0:04", bpm: 138, key: "Bbm", stems: ["vine_snap_tuned", "perc_soil_eruption"], audioFile: "transition_sweep.mp3" },
+  { id: "a-tg-07", filename: "mus_garden_transition_pruning_to_peace", category: "transition", duration: "0:06", bpm: 82, key: "Bbm", stems: ["chime_regrowth", "strings_compost_settle"], audioFile: "transition_sweep.mp3" },
   { id: "a-tg-08", filename: "mus_garden_stinger_flower_punch", category: "stinger", duration: "0:03", bpm: 138, key: "Bbm", stems: ["petal_explosion_pitched", "brass_botanical_fury"] },
   { id: "a-tg-09", filename: "mus_garden_stinger_secret_seed", category: "stinger", duration: "0:04", bpm: 82, key: "Bbm", stems: ["choir_germination_awe", "harp_sprout_cascade"] },
-  { id: "a-tg-10", filename: "mus_garden_ending_mulch_requiem", category: "ending", duration: "0:18", bpm: 82, key: "Bbm", stems: ["strings_autumn_acceptance", "flute_final_bloom", "wind_chime_memorial"] },
+  { id: "a-tg-10", filename: "mus_garden_ending_mulch_requiem", category: "ending", duration: "0:18", bpm: 82, key: "Bbm", stems: ["strings_autumn_acceptance", "flute_final_bloom", "wind_chime_memorial"], audioFile: "journey2/stinger_chapter_complete.mp3" },
   { id: "a-tg-11", filename: "mus_garden_layer_greenhouse_amb", category: "layer", duration: "4:00", bpm: 0, key: "-", stems: ["drone_fertile_dread", "insect_buzz_melodic"] },
-  { id: "a-tg-12", filename: "mus_garden_layer_pollen_cloud", category: "ambient", duration: "4:00", bpm: 0, key: "-", stems: ["shimmer_allergenic", "sneeze_reverb_tuned"] },
+  { id: "a-tg-12", filename: "mus_garden_layer_pollen_cloud", category: "ambient", duration: "4:00", bpm: 0, key: "-", stems: ["shimmer_allergenic", "sneeze_reverb_tuned"], audioFile: "journey2/mus_garden_zen_annihilation_ambient.mp3" },
 ];
 
 const tranquilGardensNodes: Node[] = [
@@ -157,15 +157,15 @@ const tranquilGardensEdges: Edge[] = [
 
 const cloudNineAssets: MusicAsset[] = [
   { id: "a-cn-01", filename: "mus_cloud_heavens_waiting_room_intro", category: "intro", duration: "0:30", bpm: 92, key: "Em", stems: ["choir_angelic_threat", "harp_cumulus", "synth_celestial_menace"] },
-  { id: "a-cn-02", filename: "mus_cloud_chainsaw_lullaby_loop", category: "loop", duration: "2:04", bpm: 92, key: "Em", stems: ["harp_cirrus_drift", "flute_stratosphere", "bass_cloud_density", "perc_raindrop_march"] },
-  { id: "a-cn-03", filename: "mus_cloud_nimbus_of_regret_loop", category: "loop", duration: "2:04", bpm: 92, key: "Em", stems: ["synth_fog_of_war", "strings_altitude_sickness", "bass_turbulence"] },
+  { id: "a-cn-02", filename: "mus_cloud_chainsaw_lullaby_loop", category: "loop", duration: "2:04", bpm: 92, key: "Em", stems: ["harp_cirrus_drift", "flute_stratosphere", "bass_cloud_density", "perc_raindrop_march"], audioFile: "journey2/mus_cloud_chainsaw_lullaby_combat.mp3" },
+  { id: "a-cn-03", filename: "mus_cloud_nimbus_of_regret_loop", category: "loop", duration: "2:04", bpm: 92, key: "Em", stems: ["synth_fog_of_war", "strings_altitude_sickness", "bass_turbulence"], audioFile: "journey2/mus_cloud_fluffy_death_explore.mp3" },
   { id: "a-cn-04", filename: "mus_cloud_freefall_of_friendship_combat_lo", category: "loop", duration: "1:00", bpm: 148, key: "Em", stems: ["perc_thunder_tribal", "brass_lightning_bolt", "strings_terminal_velocity", "synth_wind_shear"] },
   { id: "a-cn-05", filename: "mus_cloud_freefall_of_friendship_combat_hi", category: "loop", duration: "1:00", bpm: 148, key: "Em", stems: ["perc_thunder_tribal", "brass_lightning_full", "choir_falling_angels", "synth_wind_shear", "organ_cloud_cathedral"] },
-  { id: "a-cn-06", filename: "mus_cloud_transition_drift_to_plummet", category: "transition", duration: "0:03", bpm: 148, key: "Em", stems: ["thunder_crack_tuned", "choir_gasp_descending"] },
-  { id: "a-cn-07", filename: "mus_cloud_transition_plummet_to_drift", category: "transition", duration: "0:06", bpm: 92, key: "Em", stems: ["harp_ascending_relief", "wind_gentling"] },
-  { id: "a-cn-08", filename: "mus_cloud_stinger_cloud_betrayal", category: "stinger", duration: "0:03", bpm: 92, key: "Em", stems: ["cloud_dissolve_pitched", "brass_trust_issues"] },
+  { id: "a-cn-06", filename: "mus_cloud_transition_drift_to_plummet", category: "transition", duration: "0:03", bpm: 148, key: "Em", stems: ["thunder_crack_tuned", "choir_gasp_descending"], audioFile: "transition_sweep.mp3" },
+  { id: "a-cn-07", filename: "mus_cloud_transition_plummet_to_drift", category: "transition", duration: "0:06", bpm: 92, key: "Em", stems: ["harp_ascending_relief", "wind_gentling"], audioFile: "transition_sweep.mp3" },
+  { id: "a-cn-08", filename: "mus_cloud_stinger_cloud_betrayal", category: "stinger", duration: "0:03", bpm: 92, key: "Em", stems: ["cloud_dissolve_pitched", "brass_trust_issues"], audioFile: "journey2/stinger_companion_death.mp3" },
   { id: "a-cn-09", filename: "mus_cloud_stinger_angel_rage", category: "stinger", duration: "0:02", bpm: 148, key: "Em", stems: ["choir_furious_divine", "perc_halo_throw"] },
-  { id: "a-cn-10", filename: "mus_cloud_ending_gentle_landing_of_doom", category: "ending", duration: "0:16", bpm: 92, key: "Em", stems: ["strings_parachute_prayer", "harp_ground_approach", "choir_soft_impact"] },
+  { id: "a-cn-10", filename: "mus_cloud_ending_gentle_landing_of_doom", category: "ending", duration: "0:16", bpm: 92, key: "Em", stems: ["strings_parachute_prayer", "harp_ground_approach", "choir_soft_impact"], audioFile: "journey2/stinger_chapter_complete.mp3" },
   { id: "a-cn-11", filename: "mus_cloud_layer_stratosphere_amb", category: "layer", duration: "4:00", bpm: 0, key: "-", stems: ["drone_altitude", "wind_singing_threats"] },
   { id: "a-cn-12", filename: "mus_cloud_layer_angel_whispers", category: "ambient", duration: "4:00", bpm: 0, key: "-", stems: ["whisper_divine_passive_aggression", "feather_rustle_ominous"] },
 ];
@@ -206,17 +206,17 @@ const cloudNineEdges: Edge[] = [
 // ─── LEVEL 5: THE SUNSET VISTA OF TOTAL ANNIHILATION ────────────────────────
 
 const sunsetVistaAssets: MusicAsset[] = [
-  { id: "a-sv-01", filename: "mus_sunset_last_beautiful_thing_intro", category: "intro", duration: "0:34", bpm: 78, key: "Cm", stems: ["choir_doomsday_serenade", "strings_lament_gorgeous", "bell_apocalypse_toll"] },
+  { id: "a-sv-01", filename: "mus_sunset_last_beautiful_thing_intro", category: "intro", duration: "0:34", bpm: 78, key: "Cm", stems: ["choir_doomsday_serenade", "strings_lament_gorgeous", "bell_apocalypse_toll"], audioFile: "journey2/mus_sunset_golden_apocalypse_explore.mp3" },
   { id: "a-sv-02", filename: "mus_sunset_scorched_earth_lullaby_loop", category: "loop", duration: "2:32", bpm: 78, key: "Cm", stems: ["strings_volcanic_romance", "harp_ember_drift", "synth_magma_glow", "perc_ash_fall"] },
   { id: "a-sv-03", filename: "mus_sunset_warm_embrace_of_death_combat_lo", category: "loop", duration: "1:16", bpm: 155, key: "Cm", stems: ["taiko_eruption", "brass_lava_surge", "strings_heat_death", "synth_molten_bass"] },
-  { id: "a-sv-04", filename: "mus_sunset_warm_embrace_of_death_combat_hi", category: "loop", duration: "1:16", bpm: 155, key: "Cm", stems: ["taiko_eruption", "brass_orbital_bombardment", "choir_beautiful_suffering", "synth_molten_bass", "organ_volcano_cathedral"] },
-  { id: "a-sv-05", filename: "mus_sunset_romantic_destruction_boss_intro", category: "intro", duration: "0:16", bpm: 155, key: "Cm", stems: ["choir_nicholas_sparks_doom", "brass_sunset_cannon", "perc_earth_crack"] },
+  { id: "a-sv-04", filename: "mus_sunset_warm_embrace_of_death_combat_hi", category: "loop", duration: "1:16", bpm: 155, key: "Cm", stems: ["taiko_eruption", "brass_orbital_bombardment", "choir_beautiful_suffering", "synth_molten_bass", "organ_volcano_cathedral"], audioFile: "journey2/mus_sunset_thermonuclear_sunset_combat.mp3" },
+  { id: "a-sv-05", filename: "mus_sunset_romantic_destruction_boss_intro", category: "intro", duration: "0:16", bpm: 155, key: "Cm", stems: ["choir_nicholas_sparks_doom", "brass_sunset_cannon", "perc_earth_crack"], audioFile: "journey2/mus_journey2_boss_theme.mp3" },
   { id: "a-sv-06", filename: "mus_sunset_romantic_destruction_boss_p1", category: "loop", duration: "1:44", bpm: 155, key: "Cm", stems: ["everything_phase1_scorched"] },
   { id: "a-sv-07", filename: "mus_sunset_romantic_destruction_boss_p2", category: "loop", duration: "1:44", bpm: 170, key: "Cm", stems: ["everything_phase2_annihilation"] },
-  { id: "a-sv-08", filename: "mus_sunset_transition_beauty_to_bombardment", category: "transition", duration: "0:04", bpm: 155, key: "Cm", stems: ["volcano_rumble_tuned", "brass_doom_swell"] },
-  { id: "a-sv-09", filename: "mus_sunset_stinger_dramatic_point", category: "stinger", duration: "0:05", bpm: 78, key: "Cm", stems: ["strings_dramatic_gesture", "choir_behold", "wind_epic_gust"] },
+  { id: "a-sv-08", filename: "mus_sunset_transition_beauty_to_bombardment", category: "transition", duration: "0:04", bpm: 155, key: "Cm", stems: ["volcano_rumble_tuned", "brass_doom_swell"], audioFile: "transition_sweep.mp3" },
+  { id: "a-sv-09", filename: "mus_sunset_stinger_dramatic_point", category: "stinger", duration: "0:05", bpm: 78, key: "Cm", stems: ["strings_dramatic_gesture", "choir_behold", "wind_epic_gust"], audioFile: "journey2/mus_journey2_cinematic_suite.mp3" },
   { id: "a-sv-10", filename: "mus_sunset_stinger_lava_geyser", category: "stinger", duration: "0:03", bpm: 155, key: "Cm", stems: ["brass_geyser_blast", "perc_magma_burst"] },
-  { id: "a-sv-11", filename: "mus_sunset_ending_beautiful_devastation", category: "ending", duration: "0:22", bpm: 78, key: "Cm", stems: ["strings_last_sunset", "choir_gorgeous_ruin", "bell_fading_hope", "harp_ash_to_ash"] },
+  { id: "a-sv-11", filename: "mus_sunset_ending_beautiful_devastation", category: "ending", duration: "0:22", bpm: 78, key: "Cm", stems: ["strings_last_sunset", "choir_gorgeous_ruin", "bell_fading_hope", "harp_ash_to_ash"], audioFile: "journey2/stinger_chapter_complete.mp3" },
   { id: "a-sv-12", filename: "mus_sunset_layer_volcanic_amb", category: "layer", duration: "4:00", bpm: 0, key: "-", stems: ["drone_magma_romantic", "ember_crackle_musical", "heat_shimmer_dreamy"] },
 ];
 
@@ -258,15 +258,15 @@ const sunsetVistaEdges: Edge[] = [
 
 const eternalSummitAssets: MusicAsset[] = [
   { id: "a-es-01", filename: "mus_summit_destroyer_of_worlds_intro", category: "intro", duration: "0:40", bpm: 90, key: "Am", stems: ["orchestra_friendship_overture", "synth_celestial_violence", "choir_ancient_bros"] },
-  { id: "a-es-02", filename: "mus_summit_companionship_and_carnage_loop", category: "loop", duration: "2:36", bpm: 90, key: "Am", stems: ["strings_noble_destruction", "harp_summit_wind", "synth_aurora_threatening", "perc_ice_crystal"] },
+  { id: "a-es-02", filename: "mus_summit_companionship_and_carnage_loop", category: "loop", duration: "2:36", bpm: 90, key: "Am", stems: ["strings_noble_destruction", "harp_summit_wind", "synth_aurora_threatening", "perc_ice_crystal"], audioFile: "journey2/mus_summit_friendship_finale_explore.mp3" },
   { id: "a-es-03", filename: "mus_summit_combat_heartwarming_slaughter_lo", category: "loop", duration: "1:08", bpm: 168, key: "Am", stems: ["perc_avalanche_rhythm", "brass_mountain_fury", "strings_blizzard_passion", "synth_frost_rage"] },
-  { id: "a-es-04", filename: "mus_summit_combat_heartwarming_slaughter_hi", category: "loop", duration: "1:08", bpm: 168, key: "Am", stems: ["perc_avalanche_rhythm", "brass_mountain_full", "choir_frozen_screaming", "synth_frost_rage", "organ_summit_cathedral"] },
-  { id: "a-es-05", filename: "mus_summit_final_boss_convergence_intro", category: "intro", duration: "0:24", bpm: 168, key: "Am", stems: ["choir_all_scarves_unite", "orchestra_destiny_of_friendship", "synth_singularity_of_hugs"] },
+  { id: "a-es-04", filename: "mus_summit_combat_heartwarming_slaughter_hi", category: "loop", duration: "1:08", bpm: 168, key: "Am", stems: ["perc_avalanche_rhythm", "brass_mountain_full", "choir_frozen_screaming", "synth_frost_rage", "organ_summit_cathedral"], audioFile: "journey2/mus_summit_companion_carnage_combat.mp3" },
+  { id: "a-es-05", filename: "mus_summit_final_boss_convergence_intro", category: "intro", duration: "0:24", bpm: 168, key: "Am", stems: ["choir_all_scarves_unite", "orchestra_destiny_of_friendship", "synth_singularity_of_hugs"], audioFile: "journey2/mus_journey2_boss_theme.mp3" },
   { id: "a-es-06", filename: "mus_summit_final_hug_of_annihilation_boss_p1", category: "loop", duration: "2:00", bpm: 168, key: "Am", stems: ["everything_final_friendship_p1"] },
   { id: "a-es-07", filename: "mus_summit_final_hug_of_annihilation_boss_p2", category: "loop", duration: "2:00", bpm: 184, key: "Am", stems: ["everything_final_friendship_p2_ascended"] },
   { id: "a-es-08", filename: "mus_summit_final_hug_of_annihilation_boss_p3", category: "loop", duration: "2:00", bpm: 200, key: "Am", stems: ["everything_final_friendship_p3_transcendent_violence"] },
-  { id: "a-es-09", filename: "mus_summit_victory_friendship_was_violence", category: "ending", duration: "1:30", bpm: 90, key: "A", stems: ["orchestra_triumph_of_scarves", "choir_eternal_friendship", "synth_aurora_peace", "bell_never_again", "gentle_screaming"] },
-  { id: "a-es-10", filename: "mus_summit_stinger_scarf_convergence", category: "stinger", duration: "0:05", bpm: 90, key: "Am", stems: ["choir_scarf_prophecy", "brass_textile_destiny", "perc_weave_impact"] },
+  { id: "a-es-09", filename: "mus_summit_victory_friendship_was_violence", category: "ending", duration: "1:30", bpm: 90, key: "A", stems: ["orchestra_triumph_of_scarves", "choir_eternal_friendship", "synth_aurora_peace", "bell_never_again", "gentle_screaming"], audioFile: "journey2/mus_journey2_cinematic_suite.mp3" },
+  { id: "a-es-10", filename: "mus_summit_stinger_scarf_convergence", category: "stinger", duration: "0:05", bpm: 90, key: "Am", stems: ["choir_scarf_prophecy", "brass_textile_destiny", "perc_weave_impact"], audioFile: "journey2/stinger_scarf_levelup.mp3" },
   { id: "a-es-11", filename: "mus_summit_layer_blizzard_amb", category: "layer", duration: "4:00", bpm: 0, key: "-", stems: ["drone_mountain_loneliness", "wind_summit_howl", "ice_crack_melodic"] },
 ];
 

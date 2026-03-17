@@ -1,6 +1,6 @@
 import { useCallback, useRef, useEffect, useState, type DragEvent } from "react";
 import { useViewMode } from "../context/ViewModeContext";
-import { auditionAsset, stopAudition, type AssetCategory } from "../audio/synth";
+import { auditionAsset, stopAudition, setVolume, getVolume, type AssetCategory } from "../audio/synth";
 import {
   ReactFlow,
   Background,
@@ -157,9 +157,18 @@ export function Canvas({ level }: CanvasProps) {
     setTimeout(() => fitView({ padding: 0.2, duration: 400 }), 50);
   }, [setNodes, edges, fitView]);
 
+  // ─── Volume control ────────────────────────────────────────────────────────
+  const [volume, setVolumeState] = useState(getVolume());
+  const handleVolumeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = parseFloat(e.target.value);
+    setVolumeState(v);
+    setVolume(v);
+  }, []);
+
   // ─── Play Sequence: walk graph and audition each node ──────────────────────
   const [sequencePlaying, setSequencePlaying] = useState(false);
   const [sequenceNodeId, setSequenceNodeId] = useState<string | null>(null);
+  const [sequenceFullDuration, setSequenceFullDuration] = useState(false);
   const sequenceAbort = useRef(false);
 
   const handlePlaySequence = useCallback(() => {
@@ -202,29 +211,38 @@ export function Canvas({ level }: CanvasProps) {
     nodes.forEach((n) => { if (!visited.has(n.id)) order.push(n); });
 
     // Map node type → synth category + duration
-    function nodeToAudition(n: Node): { category: AssetCategory; durationMs: number } {
+    const useTransitionMode = !sequenceFullDuration;
+    function nodeToAudition(n: Node): { category: AssetCategory; durationMs: number; audioFile?: string } {
       const d = n.data as Record<string, unknown>;
+      // Try to find audio file from level assets
+      const assetRef = d.asset as string | undefined;
+      let audioFile: string | undefined;
+      if (assetRef && level?.assets) {
+        const matchedAsset = level.assets.find((a) => a.filename === assetRef || a.id === assetRef);
+        if (matchedAsset?.audioFile) audioFile = matchedAsset.audioFile;
+      }
+
       switch (n.type) {
         case "musicState": {
           const looping = d.looping as boolean;
           return looping
-            ? { category: "loop", durationMs: 3500 }
-            : { category: "intro", durationMs: 2500 };
+            ? { category: "loop", durationMs: useTransitionMode ? 10500 : 30000, audioFile }
+            : { category: "intro", durationMs: useTransitionMode ? 10500 : 20000, audioFile };
         }
         case "transition":
-          return { category: "transition", durationMs: 1800 };
+          return { category: "transition", durationMs: 3500, audioFile: "transition_sweep.mp3" };
         case "stinger":
-          return { category: "stinger", durationMs: 1200 };
+          return { category: "stinger", durationMs: useTransitionMode ? 5000 : 10000, audioFile };
         case "parameter":
-          return { category: "ambient", durationMs: 2500 };
+          return { category: "ambient", durationMs: useTransitionMode ? 5000 : 10000, audioFile };
         case "event": {
           const et = d.eventType as string;
           return et === "cinematic" || et === "igc"
-            ? { category: "intro", durationMs: 2500 }
-            : { category: "stinger", durationMs: 1200 };
+            ? { category: "intro", durationMs: useTransitionMode ? 10500 : 20000, audioFile }
+            : { category: "stinger", durationMs: useTransitionMode ? 5000 : 8000, audioFile };
         }
         default:
-          return { category: "loop", durationMs: 2000 };
+          return { category: "loop", durationMs: useTransitionMode ? 10500 : 15000, audioFile };
       }
     }
 
@@ -233,21 +251,28 @@ export function Canvas({ level }: CanvasProps) {
 
     // Play nodes one at a time
     let i = 0;
-    function playNext() {
+    async function playNext() {
       if (sequenceAbort.current || i >= order.length) {
         setSequencePlaying(false);
         setSequenceNodeId(null);
         return;
       }
       const n = order[i];
-      const { category, durationMs } = nodeToAudition(n);
+      const { category, durationMs, audioFile } = nodeToAudition(n);
       setSequenceNodeId(n.id);
-      auditionAsset({ id: n.id, category, key: "Dm", bpm: 120 });
+      await auditionAsset({
+        id: n.id,
+        category,
+        key: "Dm",
+        bpm: 120,
+        audioFile,
+        playbackMode: useTransitionMode ? "transition" : "full",
+      });
       i++;
-      setTimeout(playNext, durationMs + 300); // 300ms gap between nodes
+      setTimeout(playNext, durationMs + 300);
     }
     playNext();
-  }, [sequencePlaying, nodes, edges]);
+  }, [sequencePlaying, sequenceFullDuration, nodes, edges, level]);
 
   return (
     <div ref={reactFlowWrapper} className="flex-1 h-full">
@@ -268,7 +293,28 @@ export function Canvas({ level }: CanvasProps) {
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#1e1e3a" />
         <Controls className="!bg-[#0d0d1a] !border-canvas-accent !rounded-lg !shadow-xl [&>button]:!bg-[#0d0d1a] [&>button]:!border-canvas-accent [&>button]:!text-canvas-muted [&>button:hover]:!text-canvas-text" />
         <Panel position="top-right">
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            {/* Volume control */}
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[#0d0d1a]/90 border border-canvas-accent backdrop-blur-sm shadow-lg">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" className="text-canvas-muted">
+                <path d="M8 1.5l-4 3H1v7h3l4 3V1.5z"/>
+                {volume > 0 && <path d="M11 4.5c1.2 1.2 1.2 5.8 0 7" fill="none" stroke="currentColor" strokeWidth="1.5"/>}
+                {volume > 0.5 && <path d="M13 2.5c2 2.5 2 8.5 0 11" fill="none" stroke="currentColor" strokeWidth="1.5"/>}
+              </svg>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value={volume}
+                onChange={handleVolumeChange}
+                className="w-16 h-1 accent-canvas-highlight cursor-pointer"
+                title={`Volume: ${Math.round(volume * 100)}%`}
+              />
+              <span className="text-[9px] font-mono text-canvas-muted w-7 text-right">{Math.round(volume * 100)}%</span>
+            </div>
+
+            {/* Play Sequence */}
             <button
               onClick={handlePlaySequence}
               className={`px-3 py-1.5 text-[11px] font-semibold rounded-lg border transition-colors backdrop-blur-sm shadow-lg flex items-center gap-1.5 ${
@@ -280,7 +326,7 @@ export function Canvas({ level }: CanvasProps) {
               {sequencePlaying ? (
                 <>
                   <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><rect x="1" y="1" width="8" height="8" rx="1" /></svg>
-                  Stop Sequence
+                  Stop
                 </>
               ) : (
                 <>
@@ -289,6 +335,20 @@ export function Canvas({ level }: CanvasProps) {
                 </>
               )}
             </button>
+
+            {/* Sequence mode toggle */}
+            <button
+              onClick={() => setSequenceFullDuration((f) => !f)}
+              className={`px-2 py-1.5 text-[10px] font-semibold rounded-lg border transition-colors backdrop-blur-sm shadow-lg ${
+                sequenceFullDuration
+                  ? "bg-amber-900/30 text-amber-400 border-amber-500/40"
+                  : "bg-[#0d0d1a]/90 text-canvas-muted border-canvas-accent hover:text-canvas-text"
+              }`}
+              title={sequenceFullDuration ? "Playing full duration of each file" : "Quick preview: first/last 5s of each file"}
+            >
+              {sequenceFullDuration ? "Full" : "Quick"}
+            </button>
+
             <button
               onClick={toggleViewMode}
               className={`px-3 py-1.5 text-[11px] font-semibold rounded-lg border transition-colors backdrop-blur-sm shadow-lg ${
@@ -309,7 +369,7 @@ export function Canvas({ level }: CanvasProps) {
           {sequenceNodeId && (
             <div className="mt-2 text-right">
               <span className="px-2 py-1 text-[10px] font-mono bg-green-900/40 text-green-300 border border-green-500/30 rounded-md backdrop-blur-sm">
-                Now playing: {nodes.find((n) => n.id === sequenceNodeId)?.data?.label as string ?? sequenceNodeId}
+                ▶ {nodes.find((n) => n.id === sequenceNodeId)?.data?.label as string ?? sequenceNodeId}
               </span>
             </div>
           )}
