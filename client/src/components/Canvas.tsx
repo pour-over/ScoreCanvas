@@ -397,8 +397,8 @@ export function Canvas({ level, projectId }: CanvasProps) {
       return undefined;
     }
 
-    // Filter: skip stingers from the playback order
-    const playOrder = order.filter((n) => n.type !== "stinger");
+    // Filter: skip stingers, parameters, and events from the playback order
+    const playOrder = order.filter((n) => n.type !== "stinger" && n.type !== "parameter" && n.type !== "event");
 
     sequenceAbort.current = false;
     setSequencePlaying(true);
